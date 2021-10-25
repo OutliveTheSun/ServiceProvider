@@ -1,0 +1,53 @@
+plugins {
+    id 'java-library'
+    id 'kotlin'
+    id 'maven-publish'
+}
+
+def githubProperties = new Properties()
+githubProperties.load(new FileInputStream(file("github.properties")))
+
+def getVersionName = { ->
+    return "1.0.0"
+}
+//make sure the artifactId is lowercased
+def getArtifactId = { ->
+    return "serviceprovider"
+}
+def getGroupId = { ->
+    return "com.outlivethesun"
+}
+def getGithubUrl = { ->
+    return "https://maven.pkg.github.com/outlivethesun/ServiceProvider"
+}
+
+publishing {
+    publications {
+        bar(MavenPublication) {
+            groupId getGroupId()
+            artifactId getArtifactId()
+            version getVersionName()
+            artifact("$buildDir/libs/${getArtifactId()}.jar")
+        }
+    }
+
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri(getGithubUrl())
+            credentials {
+                username = githubProperties['gpr.usr'] ?: System.getenv("GPR_USER")
+                password = githubProperties['gpr.key'] ?: System.getenv("GPR_API_KEY")
+            }
+        }
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+}
