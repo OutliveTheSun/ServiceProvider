@@ -51,4 +51,6 @@ java {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "org.reflections:reflections:0.9.12"
+    implementation "org.jetbrains.kotlin:kotlin-reflect"
+    testImplementation "org.junit.jupiter:junit-jupiter:5.7.0"
 }
