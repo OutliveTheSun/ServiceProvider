@@ -1,6 +1,3 @@
-include ':serviceProvider'
-include ':app'
 rootProject.name = "ServiceProvider"
-include ':lib'
 include ':implementationTest'
-include ':implementationTest'
+include ':serviceProvider'
