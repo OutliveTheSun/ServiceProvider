@@ -8,7 +8,7 @@ def githubProperties = new Properties()
 githubProperties.load(new FileInputStream(file("github.properties")))
 
 def getVersionName = { ->
-    return "1.0.0"
+    return "1.0.1"
 }
 //make sure the artifactId is lowercased
 def getArtifactId = { ->
@@ -28,6 +28,22 @@ publishing {
             artifactId getArtifactId()
             version getVersionName()
             artifact("$buildDir/libs/${getArtifactId()}.jar")
+
+            //add all implementation dependencies to the pom file
+            pom.withXml {
+                def dependenciesNode = asNode().appendNode('dependencies')
+
+                configurations.implementation.allDependencies.each { dep ->
+                    if (dep.name == 'kotlin-stdlib') {
+                        //exclude standard lib for now. This dependency should be included per default everywhere
+                        return
+                    }
+                    def newDepNode = dependenciesNode.appendNode('dependency')
+                    newDepNode.appendNode('groupId', dep.group)
+                    newDepNode.appendNode('artifactId', dep.name)
+                    newDepNode.appendNode('version', dep.version)
+                }
+            }
         }
     }
 
@@ -51,6 +67,6 @@ java {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "org.reflections:reflections:0.9.12"
-    implementation "org.jetbrains.kotlin:kotlin-reflect"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.5.31"
     testImplementation "org.junit.jupiter:junit-jupiter:5.7.0"
 }
