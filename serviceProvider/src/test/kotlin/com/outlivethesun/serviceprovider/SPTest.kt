@@ -37,7 +37,7 @@ internal class SPTest {
 
     @Test
     fun getServiceUncached() {
-        assertNotEquals(SP.getService<IServiceAutowire>(), SP.getService<IServiceAutowire>())
+        assertEquals(SP.getService<IServiceAutowire>(), SP.getService<IServiceAutowire>())
     }
 
     @Test

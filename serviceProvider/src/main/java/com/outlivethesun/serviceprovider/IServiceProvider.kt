@@ -11,6 +11,12 @@ inline fun <reified A : Any> IServiceProvider.getService(): A {
     return this.getService(A::class)
 }
 
+/**
+ * Sets an existing service instance.
+ * For registering the service under its abstract type, this type has to be provided by the generics type
+ * e.g.:
+ * setService<IAbstractServiceName>(concreteServiceInstance)
+ */
 inline fun <reified A : Any> IServiceProvider.setService(service: A) {
     this.setService(A::class, service)
 }

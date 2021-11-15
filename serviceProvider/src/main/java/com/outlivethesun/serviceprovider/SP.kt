@@ -13,22 +13,26 @@ object SP : IServiceProvider {
 
         override fun <A : Any> getService(abstractServiceType: KClass<out A>): A {
             val serviceInstance =
-                serviceDefinitions[abstractServiceType as Any] ?: loadServiceDefinition(abstractServiceType)
-            return serviceInstance.createService() as A
+                serviceDefinitions[abstractServiceType as Any] ?: autowireServiceDefinition(abstractServiceType)
+            return serviceInstance.grabService() as A
         }
 
         override fun <A : Any> setService(abstractServiceType: KClass<out A>, service: A) {
             serviceDefinitions[abstractServiceType as KClass<Any>] =
-                serviceDefinitionFactory.createByInstance(service)
+                serviceDefinitionFactory.createByInstance(abstractServiceType, service)
         }
 
-        private fun <A : Any> loadServiceDefinition(abstractServiceType: KClass<A>): ServiceDefinition<A> {
+        private fun <A : Any> autowireServiceDefinition(abstractServiceType: KClass<A>): ServiceDefinition<A> {
             val listOfKClasses = reflectionsInfo.findImplementingClassesOfInterface(abstractServiceType)
             val concreteServiceType = when (listOfKClasses.size) {
                 1 -> listOfKClasses.first()
                 else -> throw RuntimeException("Unable to create service \"${abstractServiceType.simpleName}\". ${listOfKClasses.size} classes found to autowire.")
             }
-            val serviceDefinition = serviceDefinitionFactory.createByType<A>(concreteServiceType)
+            val serviceDefinition = serviceDefinitionFactory.createByType<A>(
+                abstractServiceType,
+                concreteServiceType,
+                ServiceInstanceType.SINGLE_INSTANCEABLE
+            )
             serviceDefinitions[abstractServiceType as KClass<Any>] = serviceDefinition
             return serviceDefinition
         }

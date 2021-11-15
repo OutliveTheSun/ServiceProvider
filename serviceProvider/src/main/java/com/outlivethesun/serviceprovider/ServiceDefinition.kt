@@ -1,22 +1,34 @@
+@file:Suppress("UNCHECKED_CAST")
+
 package com.outlivethesun.serviceprovider
 
+import java.lang.IllegalArgumentException
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
 data class ServiceDefinition<A>(
+    private val abstractServiceType: KClass<out Any>,
     private val concreteServiceType: KClass<out Any>,
     private val serviceInstanceType: ServiceInstanceType,
-    private var singleInstance: Any? = null
+    private var singleInstance: A? = null
 ) {
 
-    fun createService(): A {
+    fun grabService(): A {
         return if (serviceInstanceType == ServiceInstanceType.SINGLE_INSTANCEABLE) {
             if (singleInstance == null) {
-                singleInstance = concreteServiceType.createInstance()
+                singleInstance = createInstance()
             }
-            singleInstance as A
+            singleInstance!!
         } else {
-            concreteServiceType.createInstance() as A
+            createInstance()
+        }
+    }
+
+    private fun createInstance(): A {
+        try {
+            return concreteServiceType.createInstance() as A
+        } catch (e: IllegalArgumentException) {
+            throw RuntimeException("Unable to create service \"${abstractServiceType.simpleName}\". The constructor of class \"${concreteServiceType.simpleName}\" must not have any parameters.")
         }
     }
 }
