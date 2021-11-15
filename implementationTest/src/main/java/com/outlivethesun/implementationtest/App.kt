@@ -5,11 +5,13 @@ import com.outlivethesun.serviceprovider.fetch
 import com.outlivethesun.serviceprovider.put
 import com.outlivethesun.serviceprovider.remove
 
+class Test()
+
 fun main() {
 //    val service = SP.getService<IService>()
     getServiceAutowired()
 //    setGetService()
-
+    val service = SP.fetch<IService>()
 }
 
 fun setGetService() {
