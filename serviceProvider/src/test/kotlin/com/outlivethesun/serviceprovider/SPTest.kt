@@ -15,43 +15,44 @@ internal class SPTest {
     class ServiceAutowire : IServiceAutowire
 
     @Test
-    fun setService() {
+    fun put() {
         val service = Service()
-        SP.setService(IService::class, service)
-        assertEquals(service, SP.getService<IService>())
+        SP.put(IService::class, service)
+        assertEquals(service, SP.fetch<IService>())
     }
 
     @Test
     fun overwriteService() {
         val service = Service()
         val newService = Service()
-        SP.setService(IService::class, service)
-        SP.setService(IService::class, newService)
-        assertEquals(newService, SP.getService<IService>())
+        SP.put(IService::class, service)
+        SP.put(IService::class, newService)
+        assertEquals(newService, SP.fetch<IService>())
     }
 
     @Test
     fun autowire() {
-        assertNotNull(SP.getService<IServiceAutowire>())
+        assertNotNull(SP.fetch<IServiceAutowire>())
     }
 
     @Test
-    fun getServiceUncached() {
-        assertEquals(SP.getService<IServiceAutowire>(), SP.getService<IServiceAutowire>())
+    fun fetchUncached() {
+        assertEquals(SP.fetch<IServiceAutowire>(), SP.fetch<IServiceAutowire>())
     }
 
     @Test
-    fun getServiceUnautowirable() {
+    fun fetchUnautowirable() {
         try {
-            SP.getService<IServiceWithTwoImplementations>()
+            SP.fetch<IServiceWithTwoImplementations>()
             fail()
-        } catch (e: RuntimeException) { }
+        } catch (e: RuntimeException) {
+        }
     }
 
     @Test
-    fun setServiceCheckCached() {
+    fun putCheckCached() {
         val service = Service()
-        SP.setService(IService::class, service)
-        assertEquals(SP.getService<IService>(), SP.getService<IService>())
+        SP.put(IService::class, service)
+        assertEquals(SP.fetch<IService>(), SP.fetch<IService>())
     }
 }

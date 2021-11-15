@@ -3,12 +3,13 @@ package com.outlivethesun.serviceprovider
 import kotlin.reflect.KClass
 
 interface IServiceProvider {
-    fun <A : Any> getService(abstractServiceType: KClass<out A>): A
-    fun <A : Any> setService(abstractServiceType: KClass<out A>, service: A)
+    fun <A : Any> fetch(abstractServiceType: KClass<out A>): A
+    fun <A : Any> put(abstractServiceType: KClass<out A>, service: A)
+    fun <A : Any> remove(abstractServiceType: KClass<out A>)
 }
 
-inline fun <reified A : Any> IServiceProvider.getService(): A {
-    return this.getService(A::class)
+inline fun <reified A : Any> IServiceProvider.fetch(): A {
+    return this.fetch(A::class)
 }
 
 /**
@@ -17,6 +18,10 @@ inline fun <reified A : Any> IServiceProvider.getService(): A {
  * e.g.:
  * setService<IAbstractServiceName>(concreteServiceInstance)
  */
-inline fun <reified A : Any> IServiceProvider.setService(service: A) {
-    this.setService(A::class, service)
+inline fun <reified A : Any> IServiceProvider.put(service: A) {
+    this.put(A::class, service)
+}
+
+inline fun <reified A : Any> IServiceProvider.remove() {
+    this.remove(A::class)
 }
