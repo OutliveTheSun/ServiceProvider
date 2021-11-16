@@ -1,4 +1,4 @@
-package com.outlivethesun.serviceprovider
+package com.outlivethesun.serviceprovider.api
 
 enum class ServiceInstanceType {
     SINGLE_INSTANCEABLE,

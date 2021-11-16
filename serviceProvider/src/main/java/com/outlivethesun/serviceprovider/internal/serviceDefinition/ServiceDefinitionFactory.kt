@@ -1,8 +1,9 @@
-package com.outlivethesun.serviceprovider
+package com.outlivethesun.serviceprovider.internal.serviceDefinition
 
+import com.outlivethesun.serviceprovider.api.ServiceInstanceType
 import kotlin.reflect.KClass
 
-class ServiceDefinitionFactory : IServiceDefinitionFactory {
+internal class ServiceDefinitionFactory : IServiceDefinitionFactory {
     override fun <A : Any> createByInstance(abstractServiceType: KClass<*>, instance: A): ServiceDefinition<A> {
         return ServiceDefinition(abstractServiceType, instance::class, ServiceInstanceType.SINGLE_INSTANCEABLE, instance)
     }

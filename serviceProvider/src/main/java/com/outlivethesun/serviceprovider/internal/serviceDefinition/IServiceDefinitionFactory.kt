@@ -1,8 +1,9 @@
-package com.outlivethesun.serviceprovider
+package com.outlivethesun.serviceprovider.internal.serviceDefinition
 
+import com.outlivethesun.serviceprovider.api.ServiceInstanceType
 import kotlin.reflect.KClass
 
-interface IServiceDefinitionFactory {
+internal interface IServiceDefinitionFactory {
     fun <A : Any> createByInstance(
         abstractServiceType: KClass<*>,
         instance: A): ServiceDefinition<A>

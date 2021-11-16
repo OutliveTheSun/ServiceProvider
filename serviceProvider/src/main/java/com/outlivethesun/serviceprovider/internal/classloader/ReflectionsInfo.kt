@@ -1,13 +1,10 @@
-package com.outlivethesun.serviceprovider.classloader
+package com.outlivethesun.serviceprovider.internal.classloader
 
 import org.reflections.Reflections
-import org.reflections.scanners.MethodParameterScanner
 import org.reflections.scanners.SubTypesScanner
-import org.reflections.util.ClasspathHelper
-import org.reflections.util.ConfigurationBuilder
 import kotlin.reflect.KClass
 
-class ReflectionsInfo {
+internal class ReflectionsInfo {
 
     fun <A : Any> findImplementingClassesOfInterface(
         interfaceName: KClass<A>,

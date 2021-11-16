@@ -1,6 +1,8 @@
-package com.outlivethesun.serviceprovider
+package com.outlivethesun.serviceprovider.api
 
-import com.outlivethesun.serviceprovider.classloader.ReflectionsInfo
+import com.outlivethesun.serviceprovider.internal.classloader.ReflectionsInfo
+import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinition
+import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinitionFactory
 import kotlin.reflect.KClass
 
 object SP : IServiceProvider {
@@ -28,10 +30,20 @@ object SP : IServiceProvider {
 
         private fun <A : Any> autowireServiceDefinition(abstractServiceType: KClass<A>): ServiceDefinition<A> {
             val listOfKClasses = reflectionsInfo.findImplementingClassesOfInterface(abstractServiceType)
+            var numberOfKClasses = listOfKClasses.size
             val concreteServiceType = when (listOfKClasses.size) {
-                1 -> listOfKClasses.first()
-                else -> throw RuntimeException("Unable to create service \"${abstractServiceType.simpleName}\". ${listOfKClasses.size} classes found to autowire.")
+                1 -> {
+                    val implementingClass = listOfKClasses.first()
+                    if(implementingClass.java.isAnnotationPresent(Unautowirable::class.java)){
+                        numberOfKClasses = 0
+                        null
+                    }else{
+                        implementingClass
+                    }
+                }
+                else -> null
             }
+                ?: throw RuntimeException("Unable to create service \"${abstractServiceType.simpleName}\". $numberOfKClasses classes found to autowire.")
             val serviceDefinition = serviceDefinitionFactory.createByType<A>(
                 abstractServiceType,
                 concreteServiceType,

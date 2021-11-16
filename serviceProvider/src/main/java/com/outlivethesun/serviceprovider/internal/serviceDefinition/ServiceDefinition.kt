@@ -1,12 +1,13 @@
 @file:Suppress("UNCHECKED_CAST")
 
-package com.outlivethesun.serviceprovider
+package com.outlivethesun.serviceprovider.internal.serviceDefinition
 
+import com.outlivethesun.serviceprovider.api.ServiceInstanceType
 import java.lang.IllegalArgumentException
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
-data class ServiceDefinition<A>(
+internal data class ServiceDefinition<A>(
     private val abstractServiceType: KClass<out Any>,
     private val concreteServiceType: KClass<out Any>,
     private val serviceInstanceType: ServiceInstanceType,
