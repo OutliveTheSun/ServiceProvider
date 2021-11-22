@@ -6,6 +6,8 @@ plugins {
 
 def githubProperties = new Properties()
 githubProperties.load(new FileInputStream(file("github.properties")))
+def githubUsername = githubProperties['library.user'] ?: System.getenv("GPR_USER")
+def githubPublishKey = githubProperties['library.publish.key'] ?: System.getenv("GPR_API_KEY")
 
 def getVersionName = { ->
     return "1.0.6"
@@ -48,8 +50,8 @@ publishing {
             name = "GitHubPackages"
             url = uri(getGithubUrl())
             credentials {
-                username = githubProperties['gpr.usr'] ?: System.getenv("GPR_USER")
-                password = githubProperties['gpr.key'] ?: System.getenv("GPR_API_KEY")
+                username = githubUsername
+                password = githubPublishKey
             }
         }
     }
