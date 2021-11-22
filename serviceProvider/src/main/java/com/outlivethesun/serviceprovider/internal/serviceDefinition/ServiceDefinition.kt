@@ -1,15 +1,12 @@
-@file:Suppress("UNCHECKED_CAST")
-
 package com.outlivethesun.serviceprovider.internal.serviceDefinition
 
 import com.outlivethesun.serviceprovider.api.ServiceInstanceType
-import java.lang.IllegalArgumentException
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
-internal data class ServiceDefinition<A>(
-    private val abstractServiceType: KClass<out Any>,
-    private val concreteServiceType: KClass<out Any>,
+internal data class ServiceDefinition<A : Any>(
+    private val abstractServiceType: KClass<A>,
+    private val concreteServiceType: KClass<out A>,
     private val serviceInstanceType: ServiceInstanceType,
     private var singleInstance: A? = null
 ) {
@@ -27,7 +24,7 @@ internal data class ServiceDefinition<A>(
 
     private fun createInstance(): A {
         try {
-            return concreteServiceType.createInstance() as A
+            return concreteServiceType.createInstance()
         } catch (e: IllegalArgumentException) {
             throw RuntimeException("Unable to create service \"${abstractServiceType.simpleName}\". The constructor of class \"${concreteServiceType.simpleName}\" must not have any parameters.")
         }
