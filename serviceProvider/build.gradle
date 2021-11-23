@@ -10,7 +10,7 @@ def githubUsername = githubProperties['library.user'] ?: System.getenv("GPR_USER
 def githubPublishKey = githubProperties['library.publish.key'] ?: System.getenv("GPR_API_KEY")
 
 def getVersionName = { ->
-    return "1.0.6"
+    return "1.0.9"
 }
 //make sure the artifactId is lowercased
 def getArtifactId = { ->
@@ -23,6 +23,11 @@ def getGithubUrl = { ->
     return "https://maven.pkg.github.com/outlivethesun/ServiceProvider"
 }
 
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    archiveClassifier = "sources"
+}
+
 publishing {
     publications {
         bar(MavenPublication) {
@@ -30,6 +35,7 @@ publishing {
             artifactId getArtifactId()
             version getVersionName()
             artifact("$buildDir/libs/${getArtifactId()}.jar")
+            artifact sourceJar
 
             //add all implementation dependencies to the pom file
             pom.withXml {
