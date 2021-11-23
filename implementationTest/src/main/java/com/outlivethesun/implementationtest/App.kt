@@ -9,6 +9,6 @@ class Test()
 
 fun main() {
 
-    SP.fetch<IService2>()
+    SP.fetch<IService>()
 
 }

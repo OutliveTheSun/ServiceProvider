@@ -10,7 +10,7 @@ def githubUsername = githubProperties['library.user'] ?: System.getenv("GPR_USER
 def githubPublishKey = githubProperties['library.publish.key'] ?: System.getenv("GPR_API_KEY")
 
 def getVersionName = { ->
-    return "1.0.9"
+    return "1.0.12"
 }
 //make sure the artifactId is lowercased
 def getArtifactId = { ->
@@ -70,7 +70,7 @@ java {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation "org.reflections:reflections:0.9.12"
+    implementation "org.reflections:reflections:0.10.2"
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.5.30-RC"
     testImplementation "org.junit.jupiter:junit-jupiter:5.7.0"
 }
