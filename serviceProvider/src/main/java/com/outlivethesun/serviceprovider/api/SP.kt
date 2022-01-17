@@ -1,5 +1,7 @@
 package com.outlivethesun.serviceprovider.api
 
+import com.outlivethesun.serviceprovider.internal.classloader.ReflectionInfoException
+import com.outlivethesun.serviceprovider.internal.classloader.ReflectionInfoMissingPackageException
 import com.outlivethesun.serviceprovider.internal.classloader.ReflectionsInfo
 import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinition
 import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinitionFactory
@@ -42,7 +44,13 @@ object SP : IServiceProvider {
         }
 
         private fun <A : Any> autowireServiceDefinition(abstractServiceType: KClass<A>): ServiceDefinition<A> {
-            val listOfKClasses = reflectionsInfo.findImplementingClassesOfInterface(abstractServiceType)
+            val listOfKClasses: List<KClass<*>>
+            try {
+                listOfKClasses = reflectionsInfo.findImplementingClassesOfInterface(abstractServiceType)
+            } catch (e: ReflectionInfoException) {
+                throw ServiceProviderException(e.message)
+            }
+
             var numberOfKClasses = listOfKClasses.size
             val concreteServiceType = when (listOfKClasses.size) {
                 1 -> {
