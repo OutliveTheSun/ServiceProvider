@@ -2,7 +2,6 @@ package com.outlivethesun.serviceprovider.internal.classloader
 
 import org.reflections.Reflections
 import org.reflections.scanners.Scanners
-import org.reflections.scanners.SubTypesScanner
 import kotlin.reflect.KClass
 
 internal class ReflectionsInfo {
@@ -12,10 +11,18 @@ internal class ReflectionsInfo {
         packagePath: String = ""
     ): List<KClass<out A>> {
         var path = packagePath
-        if(path.isEmpty()){
-            path = interfaceName.java.`package`.name
+        if (path.isEmpty()) {
+            val firstStackElementClassname = Thread.currentThread().stackTrace.last().className
+            checkIsValidPackageName(firstStackElementClassname)
+            path = firstStackElementClassname.substringBefore(".")
         }
         val reflections = Reflections(path, Scanners.SubTypes)
         return reflections.getSubTypesOf(interfaceName.java).map { it.kotlin }
+    }
+
+    private fun checkIsValidPackageName(stackElementClassName: String) {
+        if (!stackElementClassName.contains(".")) {
+            throw RuntimeException("Classloading error: The package cannot be determined. Missing package information in calling program: $stackElementClassName")
+        }
     }
 }
