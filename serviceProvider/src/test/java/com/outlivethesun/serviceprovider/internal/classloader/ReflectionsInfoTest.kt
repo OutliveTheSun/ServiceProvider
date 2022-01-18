@@ -6,49 +6,49 @@ import io.mockk.*
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.reflections.Reflections
-import org.reflections.scanners.Scanners
 import kotlin.reflect.KClass
 
 internal class ReflectionsInfoTest{
 
     companion object{
-//        const val packagePath = "unsinn"
-        const val packagePath = "com.outlivethesun"
+        const val packagePath = "unsinn"
+//        const val packagePath = "com.outlivethesun"
     }
 
-    private val resultSet : Set<Class<out IService>> = setOf()
-    private val reflectionsInfo = ReflectionsInfo()
+    private val resultSet : MutableSet<Class<out IService>> = mutableSetOf(Service::class.java)
+    private val testObject = ReflectionsInfo()
 
     init {
         mockkConstructor(Reflections::class)
+//        every { constructedWith<Reflections>(EqMatcher(packagePath), EqMatcher(Scanners.SubTypes)).getSubTypesOf(IService::class.java) } returns resultSet
 //        every { constructedWith<Reflections>(OfTypeMatcher<KClass<IService>>(KClass::class), EqMatcher("packagePath")) }
-        every { constructedWith<Reflections>(EqMatcher(packagePath), EqMatcher(Scanners.SubTypes)).getSubTypesOf(IService::class.java) } returns resultSet
     }
 
     @Test
     fun findImplementingClassesOfInterface(){
-        val implementingClasses = reflectionsInfo.findImplementingClassesOfInterface(IService::class, packagePath)
+//        every { anyConstructed<Reflections>().getSubTypesOf(IService::class.java) } returns resultSet
+        val implementingClasses = testObject.findImplementingClassesOfInterface(IService::class, packagePath)
         assertClassFound(implementingClasses)
     }
 
     @Test
     fun findImplementingClassesOfInterfaceDefaultPath(){
-        val implementingClasses = reflectionsInfo.findImplementingClassesOfInterface(IService::class)
+        val implementingClasses = testObject.findImplementingClassesOfInterface(IService::class)
         assertClassFound(implementingClasses)
     }
 
     @Test
     fun findImplementingClassesOfInterfaceDefaultPathCached(){
-        reflectionsInfo.findImplementingClassesOfInterface(IService::class)
-        val implementingClasses = reflectionsInfo.findImplementingClassesOfInterface(IService::class)
+        testObject.findImplementingClassesOfInterface(IService::class)
+        val implementingClasses = testObject.findImplementingClassesOfInterface(IService::class)
         assertClassFound(implementingClasses)
     }
 
     @Test
     fun findImplementingClassesOfInterfaceUnmocked(){
         unmockkAll()
-        reflectionsInfo.findImplementingClassesOfInterface(IService::class)
-        val implementingClasses = reflectionsInfo.findImplementingClassesOfInterface(IService::class)
+        testObject.findImplementingClassesOfInterface(IService::class)
+        val implementingClasses = testObject.findImplementingClassesOfInterface(IService::class)
         assertClassFound(implementingClasses)
     }
 
