@@ -4,7 +4,7 @@ plugins {
     id("maven-publish")
 }
 
-VersionNumbers.dependencyVersions[project.name] = "1.0.13"
+VersionNumbers.dependencyVersions[project.name] = "1.0.14"
 
 val publicationManager = PublicationManager(project)
 publishing {

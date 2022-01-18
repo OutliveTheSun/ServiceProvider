@@ -15,17 +15,17 @@ internal class ServiceDefinitionTest {
     lateinit var serviceDefinition: ServiceDefinition<*>
 
     @Test
-    fun grabServiceTypeSingleInstanceable() {
+    fun fetchServiceTypeSingleInstanceable() {
         serviceDefinition = ServiceDefinition(
             IService::class,
             Service::class as KClass<IService>,
             ServiceInstanceType.SINGLE_INSTANCEABLE
         )
-        assertNotNull(serviceDefinition.grabService())
+        assertNotNull(serviceDefinition.fetchService())
     }
 
     @Test
-    fun grabServiceTypeSingleInstanceableWithInstance() {
+    fun fetchServiceTypeSingleInstanceableWithInstance() {
         val service = Service()
         serviceDefinition =
             ServiceDefinition(
@@ -34,37 +34,37 @@ internal class ServiceDefinitionTest {
                 ServiceInstanceType.SINGLE_INSTANCEABLE,
                 service as IService
             )
-        assertEquals(service, serviceDefinition.grabService())
+        assertEquals(service, serviceDefinition.fetchService())
     }
 
     @Test
-    fun grabServiceTypeMultiInstanceable() {
+    fun fetchServiceTypeMultiInstanceable() {
         serviceDefinition = ServiceDefinition(
             IService::class,
             Service::class as KClass<out IService>,
             ServiceInstanceType.MULTI_INSTANCEABLE
         )
-        assertNotNull(serviceDefinition.grabService())
+        assertNotNull(serviceDefinition.fetchService())
     }
 
     @Test
-    fun grabServiceTypeSingleInstanceableCached() {
+    fun fetchServiceTypeSingleInstanceableCached() {
         serviceDefinition = ServiceDefinition(
             IService::class,
             Service::class as KClass<out IService>,
             ServiceInstanceType.SINGLE_INSTANCEABLE
         )
-        assertEquals(serviceDefinition.grabService(), serviceDefinition.grabService())
+        assertEquals(serviceDefinition.fetchService(), serviceDefinition.fetchService())
     }
 
     @Test
-    fun grabServiceTypeMultiInstanceableCached() {
+    fun fetchServiceTypeMultiInstanceableCached() {
         serviceDefinition = ServiceDefinition(
             IService::class,
             Service::class as KClass<out IService>,
             ServiceInstanceType.MULTI_INSTANCEABLE
         )
-        assertNotEquals(serviceDefinition.grabService(), serviceDefinition.grabService())
+        assertNotEquals(serviceDefinition.fetchService(), serviceDefinition.fetchService())
     }
 
     @Test
@@ -72,7 +72,7 @@ internal class ServiceDefinitionTest {
         serviceDefinition =
             ServiceDefinition(IServiceWithParameters::class, ServiceWithParameter::class, ServiceInstanceType.SINGLE_INSTANCEABLE)
         try {
-            serviceDefinition.grabService()
+            serviceDefinition.fetchService()
             fail()
         } catch (e: RuntimeException) {
         }

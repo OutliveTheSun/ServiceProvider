@@ -11,7 +11,7 @@ internal data class ServiceDefinition<A : Any>(
     private var singleInstance: A? = null
 ) {
 
-    fun grabService(): A {
+    fun fetchService(): A {
         return if (serviceInstanceType == ServiceInstanceType.SINGLE_INSTANCEABLE) {
             if (singleInstance == null) {
                 singleInstance = createInstance()

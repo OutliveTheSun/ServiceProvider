@@ -17,7 +17,11 @@ object SP : IServiceProvider {
         override fun <A : Any> fetch(abstractServiceType: KClass<A>): A {
             val serviceDefinition =
                 serviceDefinitions[abstractServiceType] ?: autowireServiceDefinition(abstractServiceType)
-            return serviceDefinition.grabService() as A
+            return serviceDefinition.fetchService() as A
+        }
+
+        override fun <A : Any> find(abstractServiceType: KClass<A>): A? {
+            return serviceDefinitions[abstractServiceType]?.let { it.fetchService() as A }
         }
 
         override fun <A : Any> put(abstractServiceType: KClass<A>, service: A) {
@@ -76,6 +80,10 @@ object SP : IServiceProvider {
 
     override fun <A : Any> fetch(abstractServiceType: KClass<A>): A {
         return serviceProvider.fetch(abstractServiceType)
+    }
+
+    override fun <A : Any> find(abstractServiceType: KClass<A>): A? {
+        return serviceProvider.find(abstractServiceType)
     }
 
     override fun <A : Any> put(abstractServiceType: KClass<A>, service: A) {

@@ -2,11 +2,9 @@ package com.outlivethesun.serviceprovider.api
 
 import com.outlivethesun.serviceprovider.IService
 import com.outlivethesun.serviceprovider.Service
-import com.outlivethesun.serviceprovider.internal.classloader.ReflectionInfoException
 import com.outlivethesun.serviceprovider.internal.classloader.ReflectionInfoMissingPackageException
 import com.outlivethesun.serviceprovider.internal.classloader.ReflectionsInfo
 import io.mockk.every
-import io.mockk.mockk
 import io.mockk.mockkConstructor
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -29,12 +27,22 @@ internal class SPTest {
     interface IService4
     class Service4 : IService4
 
+    interface IServiceForFindNotToBeFound
+
+    interface IServiceForFind
+    class ServiceForFind : IServiceForFind
+
     @Unautowirable
     class ServiceUnautowireable : IServiceUnautowireable
 
     init {
         mockkConstructor(ReflectionsInfo::class)
-        every { anyConstructed<ReflectionsInfo>().findImplementingClassesOfInterface(IService4::class,"") } throws(ReflectionInfoMissingPackageException("",""))
+        every {
+            anyConstructed<ReflectionsInfo>().findImplementingClassesOfInterface(
+                IService4::class,
+                ""
+            )
+        } throws (ReflectionInfoMissingPackageException("", ""))
     }
 
     @Test
@@ -76,6 +84,7 @@ internal class SPTest {
             SP.fetch<IServiceWithTwoImplementations>()
             fail()
         } catch (e: RuntimeException) {
+            assertNotNull(e)
         }
     }
 
@@ -85,7 +94,24 @@ internal class SPTest {
             SP.fetch<IServiceUnautowireable>()
             fail()
         } catch (e: RuntimeException) {
+            assertNotNull(e)
         }
+    }
+
+    @Test
+    fun find() {
+        SP.register<IServiceForFind, ServiceForFind>()
+        assertNotNull(SP.find<IServiceForFind>())
+    }
+
+    @Test
+    fun findNull() {
+        assertNull(SP.find<IServiceForFindNotToBeFound>())
+    }
+
+    @Test
+    fun findNullNotInline() {
+        assertNull(SP.find(IServiceForFindNotToBeFound::class))
     }
 
     @Test
@@ -169,11 +195,11 @@ internal class SPTest {
     }
 
     @Test
-    fun throwsReflectionsInfoException(){
+    fun throwsReflectionsInfoException() {
         try {
             SP.fetch<IService4>()
             fail("Expected ReflectionsInfoException was not thrown")
-        }catch (e: ServiceProviderException){
+        } catch (e: ServiceProviderException) {
             assertNotNull(e)
         }
     }
