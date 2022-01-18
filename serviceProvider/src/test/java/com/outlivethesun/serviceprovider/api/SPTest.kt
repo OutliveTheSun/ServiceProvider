@@ -2,8 +2,15 @@ package com.outlivethesun.serviceprovider.api
 
 import com.outlivethesun.serviceprovider.IService
 import com.outlivethesun.serviceprovider.Service
+import com.outlivethesun.serviceprovider.internal.classloader.ReflectionInfoException
+import com.outlivethesun.serviceprovider.internal.classloader.ReflectionInfoMissingPackageException
+import com.outlivethesun.serviceprovider.internal.classloader.ReflectionsInfo
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.mockkConstructor
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.fail
 
 internal class SPTest {
 
@@ -19,8 +26,16 @@ internal class SPTest {
     interface IService3
     class Service3 : IService3
 
+    interface IService4
+    class Service4 : IService4
+
     @Unautowirable
     class ServiceUnautowireable : IServiceUnautowireable
+
+    init {
+        mockkConstructor(ReflectionsInfo::class)
+        every { anyConstructed<ReflectionsInfo>().findImplementingClassesOfInterface(IService4::class,"") } throws(ReflectionInfoMissingPackageException("",""))
+    }
 
     @Test
     fun put() {
@@ -151,5 +166,15 @@ internal class SPTest {
     fun registerWithSingleInstanceableCached() {
         SP.register<IServiceWithTwoImplementations, Service1>(ServiceInstanceType.SINGLE_INSTANCEABLE)
         assertEquals(SP.fetch<IServiceWithTwoImplementations>(), SP.fetch<IServiceWithTwoImplementations>())
+    }
+
+    @Test
+    fun throwsReflectionsInfoException(){
+        try {
+            SP.fetch<IService4>()
+            fail("Expected ReflectionsInfoException was not thrown")
+        }catch (e: ServiceProviderException){
+            assertNotNull(e)
+        }
     }
 }

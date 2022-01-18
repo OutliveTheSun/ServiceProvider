@@ -1,7 +1,6 @@
 package com.outlivethesun.serviceprovider.api
 
 import com.outlivethesun.serviceprovider.internal.classloader.ReflectionInfoException
-import com.outlivethesun.serviceprovider.internal.classloader.ReflectionInfoMissingPackageException
 import com.outlivethesun.serviceprovider.internal.classloader.ReflectionsInfo
 import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinition
 import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinitionFactory
@@ -94,5 +93,4 @@ object SP : IServiceProvider {
     ) {
         serviceProvider.register(abstractServiceType, concreteServiceType, serviceInstanceType)
     }
-
 }

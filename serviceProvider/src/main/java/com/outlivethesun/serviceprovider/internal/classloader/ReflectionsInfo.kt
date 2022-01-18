@@ -4,7 +4,7 @@ import org.reflections.Reflections
 import org.reflections.scanners.Scanners
 import kotlin.reflect.KClass
 
-internal class ReflectionsInfo {
+class ReflectionsInfo {
 
     fun <A : Any> findImplementingClassesOfInterface(
         interfaceName: KClass<A>,
