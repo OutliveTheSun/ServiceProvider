@@ -14,6 +14,7 @@ internal class ServiceDefinitionTest {
 
     lateinit var serviceDefinition: ServiceDefinition<*>
 
+    @Suppress("UNCHECKED_CAST")
     @Test
     fun fetchServiceTypeSingleInstanceable() {
         serviceDefinition = ServiceDefinition(

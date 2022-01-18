@@ -14,6 +14,6 @@ internal class ReflectionInfoExceptionTest {
     fun createReflectionInfoMissingPackageException() {
         val exception = ReflectionInfoMissingPackageException(interfaceName, runningProgramName)
         assertTrue(exception.message!!.contains(interfaceName))
-        assertTrue(exception.message!!.contains(runningProgramName))
+        assertTrue(exception.message.contains(runningProgramName))
     }
 }

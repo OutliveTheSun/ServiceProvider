@@ -9,6 +9,7 @@ import kotlin.reflect.KClass
 object SP : IServiceProvider {
     private val serviceProvider = ServiceProviderDefault()
 
+    @Suppress("UNCHECKED_CAST")
     private class ServiceProviderDefault : IServiceProvider {
         private val serviceDefinitionFactory by lazy { ServiceDefinitionFactory() }
         private val serviceDefinitions = mutableMapOf<KClass<*>, ServiceDefinition<*>>()
