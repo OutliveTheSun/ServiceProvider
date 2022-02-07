@@ -1,9 +1,9 @@
 package com.outlivethesun.serviceprovider.api
 
+import com.outlivethesun.reflectioninfo.ReflectionInfo
+import com.outlivethesun.reflectioninfo.ReflectionInfoMissingPackageException
 import com.outlivethesun.serviceprovider.IService
 import com.outlivethesun.serviceprovider.Service
-import com.outlivethesun.serviceprovider.internal.classloader.ReflectionInfoMissingPackageException
-import com.outlivethesun.serviceprovider.internal.classloader.ReflectionsInfo
 import io.mockk.every
 import io.mockk.mockkConstructor
 import org.junit.jupiter.api.Assertions.*
@@ -36,9 +36,9 @@ internal class SPTest {
     class ServiceUnautowireable : IServiceUnautowireable
 
     init {
-        mockkConstructor(ReflectionsInfo::class)
+        mockkConstructor(ReflectionInfo::class)
         every {
-            anyConstructed<ReflectionsInfo>().findImplementingClassesOfInterface(
+            anyConstructed<ReflectionInfo>().findImplementingClassesOfInterface(
                 IService4::class,
                 ""
             )

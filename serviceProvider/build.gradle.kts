@@ -4,7 +4,7 @@ plugins {
     id("maven-publish")
 }
 
-VersionNumbers.dependencyVersions[project.name] = "1.0.15"
+VersionNumbers.dependencyVersions[project.name] = "1.0.16"
 
 val publicationManager = PublicationManager(project)
 publishing {
@@ -21,8 +21,8 @@ java {
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:${VersionNumbers.kotlin}")
-    implementation("org.reflections:reflections:0.10.2")
     implementation("org.jetbrains.kotlin:kotlin-reflect:${VersionNumbers.kotlin}")
+    api("com.outlivethesun:reflectioninfo:1.0.1")
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.0")
     testImplementation("io.mockk:mockk:${VersionNumbers.mockk}")
 }

@@ -1,7 +1,7 @@
 package com.outlivethesun.serviceprovider.api
 
-import com.outlivethesun.serviceprovider.internal.classloader.ReflectionInfoException
-import com.outlivethesun.serviceprovider.internal.classloader.ReflectionsInfo
+import com.outlivethesun.reflectioninfo.ReflectionInfo
+import com.outlivethesun.reflectioninfo.ReflectionInfoException
 import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinition
 import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinitionFactory
 import kotlin.reflect.KClass
@@ -13,7 +13,8 @@ object SP : IServiceProvider {
     private class ServiceProviderDefault : IServiceProvider {
         private val serviceDefinitionFactory by lazy { ServiceDefinitionFactory() }
         private val serviceDefinitions = mutableMapOf<KClass<*>, ServiceDefinition<*>>()
-        private val reflectionsInfo by lazy { ReflectionsInfo() }
+        private val reflectionsInfo by lazy { ReflectionInfo() }.also { //TODO: add IReflectionInfo to SP
+        }
 
         override fun <A : Any> fetch(abstractServiceType: KClass<A>): A {
             val serviceDefinition =

@@ -8,6 +8,7 @@ class Test()
 
 fun main() {
 
+    //error due to commented out package in the top
     val service = SP.fetch<IInternalService>()
 //    SP.fetch<IService>()
 

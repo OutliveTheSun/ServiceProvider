@@ -2,7 +2,7 @@
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${VersionNumbers.kotlin}")
@@ -14,13 +14,15 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        RepositoryManager(rootProject).addConsumeRepository(this)
+        mavenCentral()
     }
-}
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>{
-    kotlinOptions{
-        jvmTarget="1.8"
+    //Avoids the error message "Cannot inline bytecode built with JVM target 1.8 into bytecode that is being built with JVM target 1.6"
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
     }
 }
 
