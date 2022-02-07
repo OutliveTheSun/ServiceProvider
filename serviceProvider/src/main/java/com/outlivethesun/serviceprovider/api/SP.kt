@@ -1,5 +1,6 @@
 package com.outlivethesun.serviceprovider.api
 
+import com.outlivethesun.reflectioninfo.IReflectionInfo
 import com.outlivethesun.reflectioninfo.ReflectionInfo
 import com.outlivethesun.reflectioninfo.ReflectionInfoException
 import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinition
@@ -13,7 +14,9 @@ object SP : IServiceProvider {
     private class ServiceProviderDefault : IServiceProvider {
         private val serviceDefinitionFactory by lazy { ServiceDefinitionFactory() }
         private val serviceDefinitions = mutableMapOf<KClass<*>, ServiceDefinition<*>>()
-        private val reflectionsInfo by lazy { ReflectionInfo() }.also { //TODO: add IReflectionInfo to SP
+        //boot load ReflectionInfo
+        private val reflectionInfo by lazy { ReflectionInfo() }.also{ reflectionInfoLazy ->
+            put<IReflectionInfo>(reflectionInfoLazy.value)
         }
 
         override fun <A : Any> fetch(abstractServiceType: KClass<A>): A {
@@ -51,7 +54,7 @@ object SP : IServiceProvider {
         private fun <A : Any> autowireServiceDefinition(abstractServiceType: KClass<A>): ServiceDefinition<A> {
             val listOfKClasses: List<KClass<*>>
             try {
-                listOfKClasses = reflectionsInfo.findImplementingClassesOfInterface(abstractServiceType)
+                listOfKClasses = reflectionInfo.findImplementingClassesOfInterface(abstractServiceType)
             } catch (e: ReflectionInfoException) {
                 throw ServiceProviderException(e.message)
             }
