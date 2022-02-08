@@ -32,6 +32,8 @@ internal class SPTest {
     interface IServiceForFind
     class ServiceForFind : IServiceForFind
 
+    class ServiceClassToAutowire
+
     @Unautowirable
     class ServiceUnautowireable : IServiceUnautowireable
 
@@ -202,5 +204,10 @@ internal class SPTest {
         } catch (e: ServiceProviderException) {
             assertNotNull(e)
         }
+    }
+
+    @Test
+    fun autowireServiceClass() {
+        assertNotNull(SP.fetch<ServiceClassToAutowire>())
     }
 }

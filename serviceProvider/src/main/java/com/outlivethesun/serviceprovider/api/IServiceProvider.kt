@@ -17,6 +17,10 @@ interface IServiceProvider {
      * Adds an existing service to the cache to be fetched/found later.
      */
     fun <A : Any> put(abstractServiceType: KClass<A>, service: A)
+
+    /**
+     * Removes an existing service from the cache.
+     */
     fun <A : Any> remove(abstractServiceType: KClass<A>)
     /**
      * Adds a definition of which concrete service [concreteServiceType] to be fetched when asked for a specific type [abstractServiceType].
@@ -58,6 +62,9 @@ inline fun <reified A : Any> IServiceProvider.put(service: A) {
     this.put(A::class, service)
 }
 
+/**
+ * Removes an existing service from the cache.
+ */
 inline fun <reified A : Any> IServiceProvider.remove() {
     this.remove(A::class)
 }

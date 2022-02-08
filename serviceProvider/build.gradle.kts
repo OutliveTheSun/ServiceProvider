@@ -4,7 +4,7 @@ plugins {
     id("maven-publish")
 }
 
-VersionNumbers.dependencyVersions[project.name] = "1.0.17"
+VersionNumbers.dependencyVersions[project.name] = "1.0.18"
 
 val publicationManager = PublicationManager(project)
 publishing {
@@ -12,11 +12,6 @@ publishing {
         this,
         configurations.implementation
     )
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
 }
 
 dependencies {

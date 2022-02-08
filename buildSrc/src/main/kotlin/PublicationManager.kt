@@ -120,8 +120,8 @@ class PublicationManager(private val project: Project) {
         project.configure<JavaPluginExtension> {
             //create sources jar -> runs the equivalent task
             withSourcesJar()
-            sourceCompatibility = JavaVersion.VERSION_1_7
-            targetCompatibility = JavaVersion.VERSION_1_7
+            sourceCompatibility = JavaVersion.VERSION_1_8
+            targetCompatibility = JavaVersion.VERSION_1_8
         }
     }
 }

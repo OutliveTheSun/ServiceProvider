@@ -52,27 +52,32 @@ object SP : IServiceProvider {
         }
 
         private fun <A : Any> autowireServiceDefinition(abstractServiceType: KClass<A>): ServiceDefinition<A> {
-            val listOfKClasses: List<KClass<*>>
-            try {
-                listOfKClasses = reflectionInfo.findImplementingClassesOfInterface(abstractServiceType)
-            } catch (e: ReflectionInfoException) {
-                throw ServiceProviderException(e.message)
-            }
-
-            var numberOfKClasses = listOfKClasses.size
-            val concreteServiceType = when (listOfKClasses.size) {
-                1 -> {
-                    val implementingClass = listOfKClasses.first()
-                    if (implementingClass.java.isAnnotationPresent(Unautowirable::class.java)) {
-                        numberOfKClasses = 0
-                        null
-                    } else {
-                        implementingClass
-                    }
+            val concreteServiceType: KClass<out A>
+            if(abstractServiceType.java.isInterface) {
+                val listOfKClasses: List<KClass<*>>
+                try {
+                    listOfKClasses = reflectionInfo.findImplementingClassesOfInterface(abstractServiceType)
+                } catch (e: ReflectionInfoException) {
+                    throw ServiceProviderException(e.message)
                 }
-                else -> null
+
+                var numberOfKClasses = listOfKClasses.size
+                concreteServiceType = when (listOfKClasses.size) {
+                    1 -> {
+                        val implementingClass = listOfKClasses.first()
+                        if (implementingClass.java.isAnnotationPresent(Unautowirable::class.java)) {
+                            numberOfKClasses = 0
+                            null
+                        } else {
+                            implementingClass
+                        }
+                    }
+                    else -> null
+                }
+                    ?: throw RuntimeException("Unable to create service \"${abstractServiceType.simpleName}\". $numberOfKClasses classes found to autowire.")
+            }else{
+                concreteServiceType = abstractServiceType
             }
-                ?: throw RuntimeException("Unable to create service \"${abstractServiceType.simpleName}\". $numberOfKClasses classes found to autowire.")
             val serviceDefinition = serviceDefinitionFactory.createByType(
                 abstractServiceType,
                 concreteServiceType,
