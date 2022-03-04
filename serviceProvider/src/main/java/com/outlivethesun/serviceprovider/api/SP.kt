@@ -14,8 +14,9 @@ object SP : IServiceProvider {
     private class ServiceProviderDefault : IServiceProvider {
         private val serviceDefinitionFactory by lazy { ServiceDefinitionFactory() }
         private val serviceDefinitions = mutableMapOf<KClass<*>, ServiceDefinition<*>>()
+
         //boot load ReflectionInfo
-        private val reflectionInfo by lazy { ReflectionInfo() }.also{ reflectionInfoLazy ->
+        private val reflectionInfo by lazy { ReflectionInfo() }.also { reflectionInfoLazy ->
             put<IReflectionInfo>(reflectionInfoLazy.value)
         }
 
@@ -53,7 +54,7 @@ object SP : IServiceProvider {
 
         private fun <A : Any> autowireServiceDefinition(abstractServiceType: KClass<A>): ServiceDefinition<A> {
             val concreteServiceType: KClass<out A>
-            if(abstractServiceType.java.isInterface) {
+            if (abstractServiceType.java.isInterface) {
                 val listOfKClasses: List<KClass<*>>
                 try {
                     listOfKClasses = reflectionInfo.findImplementingClassesOfInterface(abstractServiceType)
@@ -66,16 +67,21 @@ object SP : IServiceProvider {
                     1 -> {
                         val implementingClass = listOfKClasses.first()
                         if (implementingClass.java.isAnnotationPresent(Unautowirable::class.java)) {
-                            numberOfKClasses = 0
-                            null
+                            throw UnableToCreateServiceException(
+                                abstractServiceType,
+                                "0 classes found to autowire. Possible solution: Class '${implementingClass.simpleName}' found but it is annotated with '@${Unautowirable::class.simpleName}'. Remove annotation to use service '${implementingClass.simpleName}'."
+                            )
                         } else {
                             implementingClass
                         }
                     }
                     else -> null
                 }
-                    ?: throw RuntimeException("Unable to create service \"${abstractServiceType.simpleName}\". $numberOfKClasses classes found to autowire.")
-            }else{
+                    ?: throw UnableToCreateServiceException(
+                        abstractServiceType,
+                        "Too many classes ($numberOfKClasses) found to autowire."
+                    )
+            } else {
                 concreteServiceType = abstractServiceType
             }
             val serviceDefinition = serviceDefinitionFactory.createByType(
