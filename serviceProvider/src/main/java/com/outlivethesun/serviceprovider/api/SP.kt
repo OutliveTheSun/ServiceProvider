@@ -53,6 +53,7 @@ object SP : IServiceProvider {
         }
 
         private fun <A : Any> autowireServiceDefinition(abstractServiceType: KClass<A>): ServiceDefinition<A> {
+            checkServiceDefinitionsForExistingEntry(abstractServiceType)
             val concreteServiceType: KClass<out A>
             if (abstractServiceType.java.isInterface) {
                 val listOfKClasses: List<KClass<*>>
@@ -62,7 +63,7 @@ object SP : IServiceProvider {
                     throw ServiceProviderException(e.message)
                 }
 
-                var numberOfKClasses = listOfKClasses.size
+                val numberOfKClasses = listOfKClasses.size
                 concreteServiceType = when (listOfKClasses.size) {
                     1 -> {
                         val implementingClass = listOfKClasses.first()
@@ -79,7 +80,7 @@ object SP : IServiceProvider {
                 }
                     ?: throw UnableToCreateServiceException(
                         abstractServiceType,
-                        "Too many classes ($numberOfKClasses) found to autowire."
+                        "$numberOfKClasses classes found to autowire."
                     )
             } else {
                 concreteServiceType = abstractServiceType
@@ -91,6 +92,15 @@ object SP : IServiceProvider {
             )
             serviceDefinitions[abstractServiceType] = serviceDefinition
             return serviceDefinition
+        }
+
+        /**
+         * Check if a service was already requested to avoid endless loop for circular reference
+         */
+        fun <A : Any> checkServiceDefinitionsForExistingEntry(abstractServiceType: KClass<A>) {
+            if(serviceDefinitions[abstractServiceType] != null){
+                throw UnableToCreateServiceException(abstractServiceType, "Circular reference occurred when trying to autowire the service. Consider registering the service '${abstractServiceType.simpleName}' manually.")
+            }
         }
     }
 

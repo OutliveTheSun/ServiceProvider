@@ -8,6 +8,7 @@ interface IServiceProvider {
      * Throws an exception if a service cannot be created.
      */
     fun <A : Any> fetch(abstractServiceType: KClass<A>): A
+
     /**
      * Returns a cached service or null.
      */
@@ -22,6 +23,7 @@ interface IServiceProvider {
      * Removes an existing service from the cache.
      */
     fun <A : Any> remove(abstractServiceType: KClass<A>)
+
     /**
      * Adds a definition of which concrete service [concreteServiceType] to be fetched when asked for a specific type [abstractServiceType].
      * ```
