@@ -3,11 +3,14 @@ package com.outlivethesun.serviceprovider.api
 import com.outlivethesun.reflectioninfo.IReflectionInfo
 import com.outlivethesun.reflectioninfo.ReflectionInfo
 import com.outlivethesun.reflectioninfo.ReflectionInfoException
+import com.outlivethesun.serviceprovider.api.annotations.MultiInstantiable
+import com.outlivethesun.serviceprovider.internal.getServiceInstanceType
 import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinition
 import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinitionFactory
 import com.outlivethesun.serviceprovider.internal.typeFetching.ITypeFetchingMonitorer
 import com.outlivethesun.serviceprovider.internal.typeFetching.TypeFetchingMonitorer
 import kotlin.reflect.KClass
+import kotlin.reflect.full.hasAnnotation
 
 object SP : IServiceProvider {
     private val serviceProvider = ServiceProviderDefault()
@@ -108,13 +111,13 @@ object SP : IServiceProvider {
             } else {
                 concreteServiceType = abstractServiceType
             }
-            val serviceDefinition = serviceDefinitionFactory.createByType(
+            return serviceDefinitionFactory.createByType(
                 abstractServiceType,
                 concreteServiceType,
-                ServiceInstanceType.SINGLE_INSTANCEABLE
-            )
-            serviceDefinitions[abstractServiceType] = serviceDefinition
-            return serviceDefinition
+                concreteServiceType.getServiceInstanceType()
+            ).apply {
+                serviceDefinitions[abstractServiceType] = this
+            }
         }
     }
 

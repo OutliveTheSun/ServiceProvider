@@ -12,6 +12,6 @@ internal interface IServiceDefinitionFactory {
     fun <A : Any> createByType(
         abstractServiceType: KClass<A>,
         concreteServiceType: KClass<out A>,
-        serviceInstanceType: ServiceInstanceType = ServiceInstanceType.MULTI_INSTANCEABLE
+        serviceInstanceType: ServiceInstanceType = ServiceInstanceType.MULTI_INSTANTIABLE
     ): ServiceDefinition<A>
 }

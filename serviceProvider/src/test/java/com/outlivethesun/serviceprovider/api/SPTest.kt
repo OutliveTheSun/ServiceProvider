@@ -4,6 +4,7 @@ import com.outlivethesun.reflectioninfo.ReflectionInfo
 import com.outlivethesun.reflectioninfo.ReflectionInfoMissingPackageException
 import com.outlivethesun.serviceprovider.IService
 import com.outlivethesun.serviceprovider.Service
+import com.outlivethesun.serviceprovider.api.annotations.MultiInstantiable
 import io.mockk.every
 import io.mockk.mockkConstructor
 import org.junit.jupiter.api.*
@@ -11,6 +12,10 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.fail
 
 internal class SPTest {
+
+    interface IMultiInstantiableAnnotated
+    @MultiInstantiable
+    class MultiInstantiableAnnotated: IMultiInstantiableAnnotated
 
     interface IServiceContainingCircularReference
     class ServiceContainingCircularReference(service: IServiceWithCircularReference) :
@@ -202,7 +207,7 @@ internal class SPTest {
 
     @Test
     fun registerWithSingleInstanceableTypeNotInline() {
-        SP.register(IServiceWithTwoImplementations::class, Service1::class, ServiceInstanceType.SINGLE_INSTANCEABLE)
+        SP.register(IServiceWithTwoImplementations::class, Service1::class, ServiceInstanceType.SINGLE_INSTANTIABLE)
         assertNotNull(SP.fetch<IServiceWithTwoImplementations>())
         assertEquals(SP.fetch<IServiceWithTwoImplementations>(), SP.fetch<IServiceWithTwoImplementations>())
     }
@@ -216,13 +221,13 @@ internal class SPTest {
 
     @Test
     fun registerWithSingleInstanceableType() {
-        SP.register<IServiceWithTwoImplementations, Service1>(ServiceInstanceType.SINGLE_INSTANCEABLE)
+        SP.register<IServiceWithTwoImplementations, Service1>(ServiceInstanceType.SINGLE_INSTANTIABLE)
         assertNotNull(SP.fetch<IServiceWithTwoImplementations>())
     }
 
     @Test
     fun registerWithSingleInstanceableCached() {
-        SP.register<IServiceWithTwoImplementations, Service1>(ServiceInstanceType.SINGLE_INSTANCEABLE)
+        SP.register<IServiceWithTwoImplementations, Service1>(ServiceInstanceType.SINGLE_INSTANTIABLE)
         assertEquals(SP.fetch<IServiceWithTwoImplementations>(), SP.fetch<IServiceWithTwoImplementations>())
     }
 
@@ -239,6 +244,22 @@ internal class SPTest {
     @Test
     fun autowireServiceClass() {
         assertNotNull(SP.fetch<ServiceClassToAutowire>())
+    }
+
+    @Test
+    fun autowireSingleInstantiableService() {
+        assertEquals(
+            SP.fetch<IService>(),
+            SP.fetch<IService>()
+        )
+    }
+
+    @Test
+    fun autowireMultiInstantiableService() {
+        assertNotEquals(
+            SP.fetch<IMultiInstantiableAnnotated>(),
+            SP.fetch<IMultiInstantiableAnnotated>()
+        )
     }
 
     @Test

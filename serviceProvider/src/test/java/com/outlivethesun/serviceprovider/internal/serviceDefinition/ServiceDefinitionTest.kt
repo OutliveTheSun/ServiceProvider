@@ -31,7 +31,7 @@ internal class ServiceDefinitionTest {
         serviceDefinition = ServiceDefinition(
             IService::class,
             Service::class as KClass<IService>,
-            ServiceInstanceType.SINGLE_INSTANCEABLE
+            ServiceInstanceType.SINGLE_INSTANTIABLE
         )
         assertNotNull(serviceDefinition.fetchService())
     }
@@ -43,7 +43,7 @@ internal class ServiceDefinitionTest {
             ServiceDefinition(
                 IService::class,
                 Service::class as KClass<out IService>,
-                ServiceInstanceType.SINGLE_INSTANCEABLE,
+                ServiceInstanceType.SINGLE_INSTANTIABLE,
                 service as IService
             )
         assertEquals(service, serviceDefinition.fetchService())
@@ -54,7 +54,7 @@ internal class ServiceDefinitionTest {
         serviceDefinition = ServiceDefinition(
             IService::class,
             Service::class as KClass<out IService>,
-            ServiceInstanceType.MULTI_INSTANCEABLE
+            ServiceInstanceType.MULTI_INSTANTIABLE
         )
         assertNotNull(serviceDefinition.fetchService())
     }
@@ -64,7 +64,7 @@ internal class ServiceDefinitionTest {
         serviceDefinition = ServiceDefinition(
             IService::class,
             Service::class as KClass<out IService>,
-            ServiceInstanceType.SINGLE_INSTANCEABLE
+            ServiceInstanceType.SINGLE_INSTANTIABLE
         )
         assertEquals(serviceDefinition.fetchService(), serviceDefinition.fetchService())
     }
@@ -74,7 +74,7 @@ internal class ServiceDefinitionTest {
         serviceDefinition = ServiceDefinition(
             IService::class,
             Service::class as KClass<out IService>,
-            ServiceInstanceType.MULTI_INSTANCEABLE
+            ServiceInstanceType.MULTI_INSTANTIABLE
         )
         assertNotEquals(serviceDefinition.fetchService(), serviceDefinition.fetchService())
     }
@@ -85,7 +85,7 @@ internal class ServiceDefinitionTest {
             ServiceDefinition(
                 IServiceWithStringParameter::class,
                 ServiceWithStringParameter::class,
-                ServiceInstanceType.SINGLE_INSTANCEABLE
+                ServiceInstanceType.SINGLE_INSTANTIABLE
             )
         try {
             serviceDefinition.fetchService()
@@ -100,7 +100,7 @@ internal class ServiceDefinitionTest {
             ServiceDefinition(
                 IServiceWithParameter::class,
                 ServiceWithParameter::class,
-                ServiceInstanceType.SINGLE_INSTANCEABLE
+                ServiceInstanceType.SINGLE_INSTANTIABLE
             )
         val service = serviceDefinition.fetchService() as ServiceWithParameter
         assertNotNull(service)
@@ -113,7 +113,7 @@ internal class ServiceDefinitionTest {
             ServiceDefinition(
                 IServiceWithParameters::class,
                 ServiceWithParameters::class,
-                ServiceInstanceType.SINGLE_INSTANCEABLE
+                ServiceInstanceType.SINGLE_INSTANTIABLE
             )
         assertNotNull(serviceDefinition.fetchService())
     }

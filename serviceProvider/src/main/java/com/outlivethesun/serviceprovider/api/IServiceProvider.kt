@@ -41,7 +41,7 @@ interface IServiceProvider {
     fun <A : Any> register(
         abstractServiceType: KClass<A>,
         concreteServiceType: KClass<out A>,
-        serviceInstanceType: ServiceInstanceType = ServiceInstanceType.MULTI_INSTANCEABLE
+        serviceInstanceType: ServiceInstanceType = ServiceInstanceType.MULTI_INSTANTIABLE
     )
 }
 
@@ -94,6 +94,6 @@ inline fun <reified A : Any> IServiceProvider.remove() {
  * SP.register<IService, Service>() -> SP.fetch<IService> : Service()
  *
  */
-inline fun <reified A : Any, reified C : A> IServiceProvider.register(serviceInstanceType: ServiceInstanceType = ServiceInstanceType.MULTI_INSTANCEABLE) {
+inline fun <reified A : Any, reified C : A> IServiceProvider.register(serviceInstanceType: ServiceInstanceType = ServiceInstanceType.MULTI_INSTANTIABLE) {
     this.register(A::class, C::class, serviceInstanceType)
 }

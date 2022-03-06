@@ -1,6 +1,7 @@
 package com.outlivethesun.serviceprovider.internal.serviceDefinition
 
 import com.outlivethesun.serviceprovider.api.ServiceInstanceType
+import com.outlivethesun.serviceprovider.internal.getServiceInstanceType
 import kotlin.reflect.KClass
 
 internal class ServiceDefinitionFactory : IServiceDefinitionFactory {
@@ -8,7 +9,7 @@ internal class ServiceDefinitionFactory : IServiceDefinitionFactory {
         return ServiceDefinition(
             abstractServiceType,
             instance::class,
-            ServiceInstanceType.SINGLE_INSTANCEABLE,
+            instance::class.getServiceInstanceType(),
             instance
         )
     }

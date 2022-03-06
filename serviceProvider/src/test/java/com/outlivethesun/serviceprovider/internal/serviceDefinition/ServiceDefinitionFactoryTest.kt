@@ -3,10 +3,14 @@ package com.outlivethesun.serviceprovider.internal.serviceDefinition
 import com.outlivethesun.serviceprovider.IService
 import com.outlivethesun.serviceprovider.Service
 import com.outlivethesun.serviceprovider.api.ServiceInstanceType
-import com.outlivethesun.serviceprovider.internal.serviceDefinition.IServiceDefinitionFactory
-import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinitionFactory
-import org.junit.jupiter.api.Assertions.assertNotNull
+import com.outlivethesun.serviceprovider.api.annotations.MultiInstantiable
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+
+interface IMultiInstanceAnnotated
+
+@MultiInstantiable
+class MultiInstanceAnnotated : IMultiInstanceAnnotated
 
 internal class ServiceDefinitionFactoryTest {
 
@@ -28,7 +32,7 @@ internal class ServiceDefinitionFactoryTest {
             serviceDefinitionFactory.createByType<IService>(
                 IService::class,
                 Service::class,
-                ServiceInstanceType.SINGLE_INSTANCEABLE
+                ServiceInstanceType.SINGLE_INSTANTIABLE
             )
         )
     }
@@ -36,5 +40,29 @@ internal class ServiceDefinitionFactoryTest {
     @Test
     fun createByInstance() {
         assertNotNull(serviceDefinitionFactory.createByInstance(IService::class, Service()))
+    }
+
+    @Test
+    fun createByMultiInstantiableInstance() {
+        val serviceDefinition = serviceDefinitionFactory.createByInstance(
+            IMultiInstanceAnnotated::class,
+            MultiInstanceAnnotated()
+        )
+        assertNotEquals(
+            serviceDefinition.fetchService(),
+            serviceDefinition.fetchService()
+        )
+    }
+
+    @Test
+    fun createBySingleInstantiableInstance() {
+        val serviceDefinition = serviceDefinitionFactory.createByInstance(
+            IService::class,
+            Service()
+        )
+        assertEquals(
+            serviceDefinition.fetchService(),
+            serviceDefinition.fetchService()
+        )
     }
 }
