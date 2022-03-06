@@ -23,7 +23,7 @@ internal class ServiceDefinitionFactoryTest {
     }
 
     @Test
-    fun createByTypeSingleInstanceable() {
+    fun createByTypeSingleInstantiable() {
         assertNotNull(
             serviceDefinitionFactory.createByType<IService>(
                 IService::class,

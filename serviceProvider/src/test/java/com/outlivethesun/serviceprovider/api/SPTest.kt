@@ -6,11 +6,21 @@ import com.outlivethesun.serviceprovider.IService
 import com.outlivethesun.serviceprovider.Service
 import io.mockk.every
 import io.mockk.mockkConstructor
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.fail
 
 internal class SPTest {
+
+    interface IServiceContainingCircularReference
+    class ServiceContainingCircularReference(service: IServiceWithCircularReference) :
+        IServiceContainingCircularReference
+
+    interface IServiceWithCircularReference
+    class ServiceWithCircularReference(service: IServiceContainingCircularReference) : IServiceWithCircularReference
+
+    interface IServiceContainingItself
+    class ServiceContainingItself(service: IServiceContainingItself) : IServiceContainingItself
 
     interface IServiceWithTwoImplementations
     class Service1 : IServiceWithTwoImplementations
@@ -19,7 +29,7 @@ internal class SPTest {
     interface IServiceAutowire
     class ServiceAutowire : IServiceAutowire
 
-    interface IServiceUnautowireable
+    interface IServiceUnautowirable
 
     interface IService3
     class Service3 : IService3
@@ -35,7 +45,7 @@ internal class SPTest {
     class ServiceClassToAutowire
 
     @Unautowirable
-    class ServiceUnautowireable : IServiceUnautowireable
+    class ServiceUnautowirable : IServiceUnautowirable
 
     init {
         mockkConstructor(ReflectionInfo::class)
@@ -93,11 +103,26 @@ internal class SPTest {
     @Test
     fun fetchUnautowirable() {
         try {
-            SP.fetch<IServiceUnautowireable>()
+            SP.fetch<IServiceUnautowirable>()
             fail()
         } catch (e: RuntimeException) {
             assertNotNull(e)
         }
+    }
+
+    @Test
+    fun fetchOrNullFetch() {
+        assertNotNull(SP.fetchOrNull<IServiceForFind>())
+    }
+
+    @Test
+    fun fetchOrNullFetchNoServiceFoundExc() {
+        assertNull(SP.fetchOrNull<IServiceForFindNotToBeFound>())
+    }
+
+    @Test
+    fun fetchOrNullFetchUnautowirableExc() {
+        assertNull(SP.fetchOrNull<IServiceUnautowirable>())
     }
 
     @Test
@@ -142,6 +167,11 @@ internal class SPTest {
         val service = Service()
         SP.put<IService>(service)
         assertEquals(service, SP.fetch(IService::class))
+    }
+
+    @Test
+    fun fetchOrNullNotInline() {
+        assertNotNull(SP.fetchOrNull(IServiceForFind::class))
     }
 
     @Test
@@ -209,5 +239,23 @@ internal class SPTest {
     @Test
     fun autowireServiceClass() {
         assertNotNull(SP.fetch<ServiceClassToAutowire>())
+    }
+
+    @Test
+    fun createServiceCircularReferenceExc() {
+        try {
+            SP.fetch<IServiceWithCircularReference>()
+            fail("Expected to prevent circular reference")
+        } catch (e: CircularReferenceServiceProviderException) {
+        }
+    }
+
+    @Test
+    fun createServiceWithServiceContainingItselfAsParameterExc() {
+        try {
+            SP.fetch<IServiceContainingItself>()
+            fail("Expected to prevent circular reference")
+        } catch (e: CircularReferenceServiceProviderException) {
+        }
     }
 }

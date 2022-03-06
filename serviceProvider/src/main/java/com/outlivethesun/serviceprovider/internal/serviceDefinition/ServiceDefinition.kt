@@ -1,7 +1,10 @@
 package com.outlivethesun.serviceprovider.internal.serviceDefinition
 
+import com.outlivethesun.serviceprovider.api.InvalidConstructorParameterTypeServiceProviderException
 import com.outlivethesun.serviceprovider.api.SP
 import com.outlivethesun.serviceprovider.api.ServiceInstanceType
+import java.sql.Timestamp
+import java.time.LocalDate
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 import kotlin.reflect.full.createInstance
@@ -26,12 +29,6 @@ internal data class ServiceDefinition<A : Any>(
     }
 
     private fun createInstance(): A {
-//        try {
-//            return concreteServiceType.createInstance()
-//        } catch (e: IllegalArgumentException) {
-//            throw RuntimeException("Unable to create service \"${abstractServiceType.simpleName}\". The constructor of class \"${concreteServiceType.simpleName}\" must not have any parameters.")
-//        }
-//    }
         concreteServiceType.primaryConstructor!!.parameters.apply {
             return when (this.size) {
                 0 -> concreteServiceType.createInstance()
@@ -41,11 +38,24 @@ internal data class ServiceDefinition<A : Any>(
     }
 
     private fun createWithParameters(concreteServiceType: KClass<out A>, parameters: List<KParameter>): A {
-        val parameterInstances = mutableListOf<Any>()
+        val parameterValues = mutableListOf<Any?>()
         parameters.forEach { parameter ->
-            val parameterType = (parameter.type.classifier) as KClass<Any>
-            parameterInstances.add(SP.fetch(parameterType))
+            val parameterType = parameter.type.classifier as KClass<Any>
+            val parameterValue = if (isBasicType(parameterType)) {
+                throw InvalidConstructorParameterTypeServiceProviderException(concreteServiceType, parameterType)
+            } else {
+                SP.fetch(parameterType)
+            }
+            parameterValues.add(parameterValue)
         }
-        return concreteServiceType.primaryConstructor!!.call(*parameterInstances.toTypedArray())
+        return concreteServiceType.primaryConstructor!!.call(*parameterValues.toTypedArray())
+    }
+
+    private fun isBasicType(parameterType: KClass<Any>): Boolean {
+        return when (parameterType) {
+            String::class, Char::class, Byte::class, Short::class, Int::class, Boolean::class, Long::class,
+            Float::class, Double::class, Timestamp::class, LocalDate::class -> true
+            else -> false
+        }
     }
 }

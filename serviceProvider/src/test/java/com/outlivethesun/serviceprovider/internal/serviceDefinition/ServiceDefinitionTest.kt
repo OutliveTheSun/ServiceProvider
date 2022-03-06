@@ -9,14 +9,25 @@ import kotlin.reflect.KClass
 
 internal class ServiceDefinitionTest {
 
+    interface IService1ToBeAddedAsParameter
+    interface IService2ToBeAddedAsParameter
+    class ServiceToBeAddedAsParameter : IService1ToBeAddedAsParameter, IService2ToBeAddedAsParameter
+    interface IServiceWithParameter
+    class ServiceWithParameter(val parameterService: IService1ToBeAddedAsParameter) : IServiceWithParameter
     interface IServiceWithParameters
-    class ServiceWithParameter(parameter: String) : IServiceWithParameters
+    class ServiceWithParameters(
+        val parameterService1: IService1ToBeAddedAsParameter,
+        val parameterService2: IService2ToBeAddedAsParameter
+    ) : IServiceWithParameters
 
-    lateinit var serviceDefinition: ServiceDefinition<*>
+    interface IServiceWithStringParameter
+    class ServiceWithStringParameter(parameter: String) : IServiceWithStringParameter
+
+    private lateinit var serviceDefinition: ServiceDefinition<*>
 
     @Suppress("UNCHECKED_CAST")
     @Test
-    fun fetchServiceTypeSingleInstanceable() {
+    fun fetchServiceTypeSingleInstantiable() {
         serviceDefinition = ServiceDefinition(
             IService::class,
             Service::class as KClass<IService>,
@@ -26,7 +37,7 @@ internal class ServiceDefinitionTest {
     }
 
     @Test
-    fun fetchServiceTypeSingleInstanceableWithInstance() {
+    fun fetchServiceTypeSingleInstantiableWithInstance() {
         val service = Service()
         serviceDefinition =
             ServiceDefinition(
@@ -39,7 +50,7 @@ internal class ServiceDefinitionTest {
     }
 
     @Test
-    fun fetchServiceTypeMultiInstanceable() {
+    fun fetchServiceTypeMultiInstantiable() {
         serviceDefinition = ServiceDefinition(
             IService::class,
             Service::class as KClass<out IService>,
@@ -49,7 +60,7 @@ internal class ServiceDefinitionTest {
     }
 
     @Test
-    fun fetchServiceTypeSingleInstanceableCached() {
+    fun fetchServiceTypeSingleInstantiableCached() {
         serviceDefinition = ServiceDefinition(
             IService::class,
             Service::class as KClass<out IService>,
@@ -59,7 +70,7 @@ internal class ServiceDefinitionTest {
     }
 
     @Test
-    fun fetchServiceTypeMultiInstanceableCached() {
+    fun fetchServiceTypeMultiInstantiableCached() {
         serviceDefinition = ServiceDefinition(
             IService::class,
             Service::class as KClass<out IService>,
@@ -69,9 +80,13 @@ internal class ServiceDefinitionTest {
     }
 
     @Test
-    fun createServiceParameterExc() {
+    fun createServiceWithStringParameterExc() {
         serviceDefinition =
-            ServiceDefinition(IServiceWithParameters::class, ServiceWithParameter::class, ServiceInstanceType.SINGLE_INSTANCEABLE)
+            ServiceDefinition(
+                IServiceWithStringParameter::class,
+                ServiceWithStringParameter::class,
+                ServiceInstanceType.SINGLE_INSTANCEABLE
+            )
         try {
             serviceDefinition.fetchService()
             fail()
@@ -79,4 +94,27 @@ internal class ServiceDefinitionTest {
         }
     }
 
+    @Test
+    fun createServiceWithParameter() {
+        serviceDefinition =
+            ServiceDefinition(
+                IServiceWithParameter::class,
+                ServiceWithParameter::class,
+                ServiceInstanceType.SINGLE_INSTANCEABLE
+            )
+        val service = serviceDefinition.fetchService() as ServiceWithParameter
+        assertNotNull(service)
+        assertNotNull(service.parameterService)
+    }
+
+    @Test
+    fun createServiceWithParameters() {
+        serviceDefinition =
+            ServiceDefinition(
+                IServiceWithParameters::class,
+                ServiceWithParameters::class,
+                ServiceInstanceType.SINGLE_INSTANCEABLE
+            )
+        assertNotNull(serviceDefinition.fetchService())
+    }
 }

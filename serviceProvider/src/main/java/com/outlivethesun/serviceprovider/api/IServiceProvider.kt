@@ -10,6 +10,12 @@ interface IServiceProvider {
     fun <A : Any> fetch(abstractServiceType: KClass<A>): A
 
     /**
+     * Returns a cached service. Creates a service if it is not cached yet by autowiring or prior registration.
+     * Returns null if there is no service to be autowired.
+     */
+    fun <A : Any> fetchOrNull(abstractServiceType: KClass<A>): A?
+
+    /**
      * Returns a cached service or null.
      */
     fun <A : Any> find(abstractServiceType: KClass<A>): A?
@@ -48,7 +54,16 @@ inline fun <reified A : Any> IServiceProvider.fetch(): A {
 }
 
 /**
+ * Returns a cached service. Creates a service if it is not cached yet by autowiring or prior registration.
+ * Returns null if there is no service to be autowired.
+ */
+inline fun <reified A : Any> IServiceProvider.fetchOrNull(): A? {
+    return this.fetchOrNull(A::class)
+}
+
+/**
  * Returns a cached service or null.
+ * A service can also be added manually by calling [register].
  */
 inline fun <reified A : Any> IServiceProvider.find(): A? {
     return this.find(A::class)

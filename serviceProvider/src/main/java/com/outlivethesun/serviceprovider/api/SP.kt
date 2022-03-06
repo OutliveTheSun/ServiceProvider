@@ -5,6 +5,8 @@ import com.outlivethesun.reflectioninfo.ReflectionInfo
 import com.outlivethesun.reflectioninfo.ReflectionInfoException
 import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinition
 import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinitionFactory
+import com.outlivethesun.serviceprovider.internal.typeFetching.ITypeFetchingMonitorer
+import com.outlivethesun.serviceprovider.internal.typeFetching.TypeFetchingMonitorer
 import kotlin.reflect.KClass
 
 object SP : IServiceProvider {
@@ -14,6 +16,7 @@ object SP : IServiceProvider {
     private class ServiceProviderDefault : IServiceProvider {
         private val serviceDefinitionFactory by lazy { ServiceDefinitionFactory() }
         private val serviceDefinitions = mutableMapOf<KClass<*>, ServiceDefinition<*>>()
+        private val typeFetchingMonitorer: ITypeFetchingMonitorer by lazy { TypeFetchingMonitorer() }
 
         //boot load ReflectionInfo
         private val reflectionInfo by lazy { ReflectionInfo() }.also { reflectionInfoLazy ->
@@ -21,9 +24,32 @@ object SP : IServiceProvider {
         }
 
         override fun <A : Any> fetch(abstractServiceType: KClass<A>): A {
-            val serviceDefinition =
-                serviceDefinitions[abstractServiceType] ?: autowireServiceDefinition(abstractServiceType)
-            return serviceDefinition.fetchService() as A
+            /**
+             * Check if a service was already requested to avoid endless loop for circular reference
+             */
+            typeFetchingMonitorer.checkIfFetchingAllowed(abstractServiceType)
+            val service: A
+            try {
+                typeFetchingMonitorer.addAsInFetchingProcess(abstractServiceType)
+                val serviceDefinition =
+                    serviceDefinitions[abstractServiceType] ?: autowireServiceDefinition(abstractServiceType)
+                service = serviceDefinition.fetchService() as A
+                typeFetchingMonitorer.removeFromBeingFetched(abstractServiceType)
+            } catch (e: ServiceProviderException) {
+                typeFetchingMonitorer.removeFromBeingFetched(abstractServiceType)
+                throw e
+            }
+            return service
+        }
+
+        override fun <A : Any> fetchOrNull(abstractServiceType: KClass<A>): A? {
+            return try {
+                SP.fetch(abstractServiceType)
+            } catch (e: AutowireUnautowirableServiceProviderException) {
+                null
+            } catch (e: AutowireNoClassFoundServiceProviderException) {
+                null
+            }
         }
 
         override fun <A : Any> find(abstractServiceType: KClass<A>): A? {
@@ -53,7 +79,6 @@ object SP : IServiceProvider {
         }
 
         private fun <A : Any> autowireServiceDefinition(abstractServiceType: KClass<A>): ServiceDefinition<A> {
-            checkServiceDefinitionsForExistingEntry(abstractServiceType)
             val concreteServiceType: KClass<out A>
             if (abstractServiceType.java.isInterface) {
                 val listOfKClasses: List<KClass<*>>
@@ -68,20 +93,18 @@ object SP : IServiceProvider {
                     1 -> {
                         val implementingClass = listOfKClasses.first()
                         if (implementingClass.java.isAnnotationPresent(Unautowirable::class.java)) {
-                            throw UnableToCreateServiceException(
-                                abstractServiceType,
-                                "0 classes found to autowire. Possible solution: Class '${implementingClass.simpleName}' found but it is annotated with '@${Unautowirable::class.simpleName}'. Remove annotation to use service '${implementingClass.simpleName}'."
-                            )
+                            throw AutowireUnautowirableServiceProviderException(abstractServiceType, implementingClass)
                         } else {
                             implementingClass
                         }
                     }
                     else -> null
                 }
-                    ?: throw UnableToCreateServiceException(
-                        abstractServiceType,
-                        "$numberOfKClasses classes found to autowire."
-                    )
+                    ?: if (numberOfKClasses == 0) {
+                        throw AutowireNoClassFoundServiceProviderException(abstractServiceType)
+                    } else {
+                        throw AutowireTooManyClassesFoundServiceProviderException(abstractServiceType, numberOfKClasses)
+                    }
             } else {
                 concreteServiceType = abstractServiceType
             }
@@ -93,19 +116,14 @@ object SP : IServiceProvider {
             serviceDefinitions[abstractServiceType] = serviceDefinition
             return serviceDefinition
         }
-
-        /**
-         * Check if a service was already requested to avoid endless loop for circular reference
-         */
-        fun <A : Any> checkServiceDefinitionsForExistingEntry(abstractServiceType: KClass<A>) {
-            if(serviceDefinitions[abstractServiceType] != null){
-                throw UnableToCreateServiceException(abstractServiceType, "Circular reference occurred when trying to autowire the service. Consider registering the service '${abstractServiceType.simpleName}' manually.")
-            }
-        }
     }
 
     override fun <A : Any> fetch(abstractServiceType: KClass<A>): A {
         return serviceProvider.fetch(abstractServiceType)
+    }
+
+    override fun <A : Any> fetchOrNull(abstractServiceType: KClass<A>): A? {
+        return serviceProvider.fetchOrNull(abstractServiceType)
     }
 
     override fun <A : Any> find(abstractServiceType: KClass<A>): A? {
