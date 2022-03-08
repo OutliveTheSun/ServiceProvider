@@ -1,5 +1,6 @@
-package com.outlivethesun.serviceprovider.api
+package com.outlivethesun.serviceprovider.api.exceptions
 
+import com.outlivethesun.serviceprovider.api.exceptions.ServiceProviderException
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 

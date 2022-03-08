@@ -1,7 +1,7 @@
 package com.outlivethesun.serviceprovider.internal.serviceDefinition
 
-import com.outlivethesun.serviceprovider.IService
-import com.outlivethesun.serviceprovider.Service
+import com.outlivethesun.serviceprovider.api.testData.IService
+import com.outlivethesun.serviceprovider.api.testData.Service
 import com.outlivethesun.serviceprovider.api.ServiceInstanceType
 import com.outlivethesun.serviceprovider.api.annotations.MultiInstantiable
 import org.junit.jupiter.api.Assertions.*

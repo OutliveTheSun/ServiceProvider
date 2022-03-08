@@ -1,4 +1,4 @@
-package com.outlivethesun.serviceprovider.internal
+package com.outlivethesun.serviceprovider.internal.extensions
 
 import com.outlivethesun.serviceprovider.api.ServiceInstanceType
 import com.outlivethesun.serviceprovider.api.annotations.MultiInstantiable

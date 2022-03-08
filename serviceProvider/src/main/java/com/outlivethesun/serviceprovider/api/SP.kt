@@ -2,15 +2,15 @@ package com.outlivethesun.serviceprovider.api
 
 import com.outlivethesun.reflectioninfo.IReflectionInfo
 import com.outlivethesun.reflectioninfo.ReflectionInfo
-import com.outlivethesun.reflectioninfo.ReflectionInfoException
-import com.outlivethesun.serviceprovider.api.annotations.MultiInstantiable
-import com.outlivethesun.serviceprovider.internal.getServiceInstanceType
+import com.outlivethesun.serviceprovider.api.exceptions.NoClassFoundServiceProviderException
+import com.outlivethesun.serviceprovider.api.exceptions.ServiceProviderException
+import com.outlivethesun.serviceprovider.api.exceptions.UnautowirableServiceProviderException
+import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinitionDictionary
 import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinition
 import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinitionFactory
-import com.outlivethesun.serviceprovider.internal.typeFetching.ITypeFetchingMonitorer
-import com.outlivethesun.serviceprovider.internal.typeFetching.TypeFetchingMonitorer
+import com.outlivethesun.serviceprovider.internal.typeFetchingTracker.ITypeFetchingTracker
+import com.outlivethesun.serviceprovider.internal.typeFetchingTracker.TypeFetchingTracker
 import kotlin.reflect.KClass
-import kotlin.reflect.full.hasAnnotation
 
 object SP : IServiceProvider {
     private val serviceProvider = ServiceProviderDefault()
@@ -18,8 +18,9 @@ object SP : IServiceProvider {
     @Suppress("UNCHECKED_CAST")
     private class ServiceProviderDefault : IServiceProvider {
         private val serviceDefinitionFactory by lazy { ServiceDefinitionFactory() }
+        private val serviceDefinitionDictionary by lazy { ServiceDefinitionDictionary(serviceDefinitionFactory, reflectionInfo) }
         private val serviceDefinitions = mutableMapOf<KClass<*>, ServiceDefinition<*>>()
-        private val typeFetchingMonitorer: ITypeFetchingMonitorer by lazy { TypeFetchingMonitorer() }
+        private val typeFetchingTracker: ITypeFetchingTracker by lazy { TypeFetchingTracker() }
 
         //boot load ReflectionInfo
         private val reflectionInfo by lazy { ReflectionInfo() }.also { reflectionInfoLazy ->
@@ -30,16 +31,16 @@ object SP : IServiceProvider {
             /**
              * Check if a service was already requested to avoid endless loop for circular reference
              */
-            typeFetchingMonitorer.checkIfFetchingAllowed(abstractServiceType)
+            typeFetchingTracker.checkIsNotAlreadyTracking(abstractServiceType)
             val service: A
             try {
-                typeFetchingMonitorer.addAsInFetchingProcess(abstractServiceType)
+                typeFetchingTracker.startTracking(abstractServiceType)
                 val serviceDefinition =
-                    serviceDefinitions[abstractServiceType] ?: autowireServiceDefinition(abstractServiceType)
+                    serviceDefinitions[abstractServiceType] ?: fetchServiceDefinitionFromDictionary(abstractServiceType)
                 service = serviceDefinition.fetchService() as A
-                typeFetchingMonitorer.removeFromBeingFetched(abstractServiceType)
+                typeFetchingTracker.stopTracking(abstractServiceType)
             } catch (e: ServiceProviderException) {
-                typeFetchingMonitorer.removeFromBeingFetched(abstractServiceType)
+                typeFetchingTracker.stopTracking(abstractServiceType)
                 throw e
             }
             return service
@@ -48,9 +49,9 @@ object SP : IServiceProvider {
         override fun <A : Any> fetchOrNull(abstractServiceType: KClass<A>): A? {
             return try {
                 SP.fetch(abstractServiceType)
-            } catch (e: AutowireUnautowirableServiceProviderException) {
+            } catch (e: UnautowirableServiceProviderException) {
                 null
-            } catch (e: AutowireNoClassFoundServiceProviderException) {
+            } catch (e: NoClassFoundServiceProviderException) {
                 null
             }
         }
@@ -81,42 +82,9 @@ object SP : IServiceProvider {
                 )
         }
 
-        private fun <A : Any> autowireServiceDefinition(abstractServiceType: KClass<A>): ServiceDefinition<A> {
-            val concreteServiceType: KClass<out A>
-            if (abstractServiceType.java.isInterface) {
-                val listOfKClasses: List<KClass<*>>
-                try {
-                    listOfKClasses = reflectionInfo.findImplementingClassesOfInterface(abstractServiceType)
-                } catch (e: ReflectionInfoException) {
-                    throw ServiceProviderException(e.message)
-                }
-
-                val numberOfKClasses = listOfKClasses.size
-                concreteServiceType = when (listOfKClasses.size) {
-                    1 -> {
-                        val implementingClass = listOfKClasses.first()
-                        if (implementingClass.java.isAnnotationPresent(Unautowirable::class.java)) {
-                            throw AutowireUnautowirableServiceProviderException(abstractServiceType, implementingClass)
-                        } else {
-                            implementingClass
-                        }
-                    }
-                    else -> null
-                }
-                    ?: if (numberOfKClasses == 0) {
-                        throw AutowireNoClassFoundServiceProviderException(abstractServiceType)
-                    } else {
-                        throw AutowireTooManyClassesFoundServiceProviderException(abstractServiceType, numberOfKClasses)
-                    }
-            } else {
-                concreteServiceType = abstractServiceType
-            }
-            return serviceDefinitionFactory.createByType(
-                abstractServiceType,
-                concreteServiceType,
-                concreteServiceType.getServiceInstanceType()
-            ).apply {
-                serviceDefinitions[abstractServiceType] = this
+        private fun <A : Any> fetchServiceDefinitionFromDictionary(abstractServiceType: KClass<A>): ServiceDefinition<A> {
+            return serviceDefinitionDictionary.fetch(abstractServiceType).also {
+                serviceDefinitions[abstractServiceType] = it
             }
         }
     }

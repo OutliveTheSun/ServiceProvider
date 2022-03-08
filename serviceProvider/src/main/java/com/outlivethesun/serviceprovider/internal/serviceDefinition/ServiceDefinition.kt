@@ -1,6 +1,6 @@
 package com.outlivethesun.serviceprovider.internal.serviceDefinition
 
-import com.outlivethesun.serviceprovider.api.InvalidConstructorParameterTypeServiceProviderException
+import com.outlivethesun.serviceprovider.api.exceptions.InvalidConstructorParameterTypeServiceProviderException
 import com.outlivethesun.serviceprovider.api.SP
 import com.outlivethesun.serviceprovider.api.ServiceInstanceType
 import java.sql.Timestamp
