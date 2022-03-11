@@ -40,6 +40,7 @@ internal data class ServiceDefinition<A : Any>(
     private fun createWithParameters(concreteServiceType: KClass<out A>, parameters: List<KParameter>): A {
         val parameterValues = mutableListOf<Any?>()
         parameters.forEach { parameter ->
+            @Suppress("UNCHECKED_CAST")
             val parameterType = parameter.type.classifier as KClass<Any>
             val parameterValue = if (isBasicType(parameterType)) {
                 throw InvalidConstructorParameterTypeServiceProviderException(concreteServiceType, parameterType)

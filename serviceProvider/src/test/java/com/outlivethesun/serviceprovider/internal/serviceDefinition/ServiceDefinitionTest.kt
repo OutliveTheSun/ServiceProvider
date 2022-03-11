@@ -21,6 +21,7 @@ internal class ServiceDefinitionTest {
     ) : IServiceWithParameters
 
     interface IServiceWithStringParameter
+    @Suppress("UNUSED_PARAMETER")
     class ServiceWithStringParameter(parameter: String) : IServiceWithStringParameter
 
     private lateinit var serviceDefinition: ServiceDefinition<*>

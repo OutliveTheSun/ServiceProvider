@@ -1,7 +1,13 @@
+import org.gradle.kotlin.dsl.provideDelegate
+import propertiesFileManager.PropertiesFileManager
+
 object Config {
     const val groupId = "com.outlivethesun"
     const val githubURL = "https://maven.pkg.github.com/outlivethesun"
-    const val githubLibraryUser = "OutliveTheSun"
-    const val githubLibraryKeyPublish = "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"
-    const val githubLibraryKeyConsume = "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"
+    private var githubConfigFilePath = "${System.getProperty("user.home")}\\GithubPackagePublishingConfig\\"
+    private const val githubConfigFileName = "config.properties"
+    private val propertiesFileManager by lazy { PropertiesFileManager(githubConfigFilePath, githubConfigFileName) }
+    val githubLibraryUser: String? by lazy { propertiesFileManager.readValueFromFile("githubLibraryUser") }
+    val githubLibraryKeyPublish: String? by lazy { propertiesFileManager.readValueFromFile("githubLibraryKeyPublish") }
+    val githubLibraryKeyConsume: String? by lazy { propertiesFileManager.readValueFromFile("githubLibraryKeyConsume") }
 }
