@@ -1,5 +1,8 @@
 import org.gradle.api.Project
 
+/**
+ * This class provides information on the module (library)
+ */
 class ModuleInfo(private val module: Project) {
 
     fun getArtifactId(): String {

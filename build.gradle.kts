@@ -13,9 +13,10 @@ buildscript {
 
 allprojects {
     repositories {
-        google()
-        RepositoryManager(rootProject).addConsumeRepository(this)
         mavenCentral()
+        google()
+        outlivethesunSetup.repositoryConfigurator.github.GithubPackageRepositoryConfigurator(rootProject)
+            .addConsumeRepository(this)
     }
 
     //Avoids the error message "Cannot inline bytecode built with JVM target 1.8 into bytecode that is being built with JVM target 1.6"
