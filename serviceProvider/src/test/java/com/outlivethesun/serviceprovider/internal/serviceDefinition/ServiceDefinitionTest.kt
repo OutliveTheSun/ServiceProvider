@@ -3,6 +3,7 @@ package com.outlivethesun.serviceprovider.internal.serviceDefinition
 import com.outlivethesun.serviceprovider.api.ServiceInstanceType
 import com.outlivethesun.serviceprovider.api.testData.IService
 import com.outlivethesun.serviceprovider.api.testData.Service
+import com.outlivethesun.serviceprovider.internal.ServiceProvider
 import com.outlivethesun.serviceprovider.internal.serviceRequest.IServiceRequest
 import com.outlivethesun.serviceprovider.internal.serviceRequest.typeFetchingTracker.ITypeFetchingTracker
 import io.mockk.every
@@ -15,10 +16,12 @@ import kotlin.reflect.KClass
 internal class ServiceDefinitionTest {
 
     private var mockServiceRequest: IServiceRequest = mockk()
+    private var mockServiceProvider = mockk<ServiceProvider>()
     private var mockTypeFetchingTracker: ITypeFetchingTracker = mockk(relaxed = true)
 
     init {
         every { mockServiceRequest.typeFetchingTracker } returns mockTypeFetchingTracker
+        every { mockServiceRequest.serviceProvider } returns mockServiceProvider
     }
 
     interface IService1ToBeAddedAsParameter
@@ -109,6 +112,8 @@ internal class ServiceDefinitionTest {
 
     @Test
     fun createServiceWithParameter() {
+        val mockServiceParameter = mockk<IService2ToBeAddedAsParameter>()
+        every { mockServiceProvider.fetch(IService2ToBeAddedAsParameter::class, mockServiceRequest) } returns mockServiceParameter
         testObject =
             ServiceDefinition(
                 ServiceWithParameter::class,

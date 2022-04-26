@@ -1,8 +1,9 @@
 package com.outlivethesun.serviceprovider.internal.serviceDefinition
 
+import com.outlivethesun.serviceprovider.api.SP
 import com.outlivethesun.serviceprovider.api.ServiceInstanceType
-import com.outlivethesun.serviceprovider.api.ServiceProvider
 import com.outlivethesun.serviceprovider.api.exceptions.InvalidConstructorParameterTypeServiceProviderException
+import com.outlivethesun.serviceprovider.internal.ServiceProvider
 import com.outlivethesun.serviceprovider.internal.serviceRequest.IServiceRequest
 import java.sql.Timestamp
 import java.time.LocalDate
@@ -52,7 +53,7 @@ internal class ServiceDefinition<T : Any>(
             val parameterValue = if (isBasicType(parameterType)) {
                 throw InvalidConstructorParameterTypeServiceProviderException(concreteServiceType, parameterType)
             } else {
-                ServiceProvider.fetch(parameterType, serviceRequest)
+                serviceRequest.serviceProvider.fetch(parameterType, serviceRequest)
             }
             parameterValues.add(parameterValue)
         }

@@ -3,10 +3,7 @@ package com.outlivethesun.serviceprovider.internal.serviceDefinition
 import com.outlivethesun.reflectioninfo.IReflectionInfo
 import com.outlivethesun.reflectioninfo.ReflectionInfoException
 import com.outlivethesun.serviceprovider.api.annotations.Unautowirable
-import com.outlivethesun.serviceprovider.api.exceptions.NoClassFoundServiceProviderException
-import com.outlivethesun.serviceprovider.api.exceptions.ServiceProviderException
-import com.outlivethesun.serviceprovider.api.exceptions.TooManyClassesFoundServiceProviderException
-import com.outlivethesun.serviceprovider.api.exceptions.UnautowirableServiceProviderException
+import com.outlivethesun.serviceprovider.api.exceptions.*
 import com.outlivethesun.serviceprovider.internal.extensions.getServiceInstanceType
 import kotlin.reflect.KClass
 import kotlin.reflect.full.hasAnnotation
@@ -29,7 +26,7 @@ internal class ServiceDefinitionDictionary(
 
     private fun <T : Any> findConcreteServiceTypeByClass(abstractServiceType: KClass<T>) =
         if (abstractServiceType.hasAnnotation<Unautowirable>()) {
-            throw UnautowirableServiceProviderException(abstractServiceType, abstractServiceType)
+            throw NoClassFoundUnautowireableAnnotationPresentException(abstractServiceType, abstractServiceType)
         } else {
             abstractServiceType
         }
@@ -72,9 +69,9 @@ internal class ServiceDefinitionDictionary(
         abstractServiceType: KClass<out T>
     ): Nothing {
         if (unautowirableImplementingClasses.isEmpty()) {
-            throw NoClassFoundServiceProviderException(abstractServiceType)
+            throw NoClassFoundAutowireException(abstractServiceType)
         } else {
-            throw UnautowirableServiceProviderException(
+            throw NoClassFoundUnautowireableAnnotationPresentException(
                 abstractServiceType,
                 unautowirableImplementingClasses.first()
             )

@@ -2,8 +2,8 @@ package com.outlivethesun.serviceprovider.api
 
 import com.outlivethesun.reflectioninfo.ReflectionInfo
 import com.outlivethesun.serviceprovider.api.exceptions.CircularReferenceServiceProviderException
-import com.outlivethesun.serviceprovider.api.exceptions.NoClassFoundServiceProviderException
-import com.outlivethesun.serviceprovider.api.exceptions.UnautowirableServiceProviderException
+import com.outlivethesun.serviceprovider.api.exceptions.NoClassFoundAutowireException
+import com.outlivethesun.serviceprovider.api.exceptions.NoClassFoundUnautowireableAnnotationPresentException
 import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinition
 import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinitionDictionary
 import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinitionFactory
@@ -34,8 +34,8 @@ internal class SPFetchTest {
         private lateinit var mockFetchService: FetchService
         private lateinit var mockFetchOrNullService: FetchOrNullService
 
-        @JvmStatic
-        @BeforeAll
+//        @JvmStatic
+//        @BeforeAll
         fun setup() {
             mockkConstructor(ReflectionInfo::class)
             mockkConstructor(ServiceDefinitionFactory::class)
@@ -50,11 +50,11 @@ internal class SPFetchTest {
             mockFetchService = setupServiceDefinition(FetchService::class)
             mockFetchOrNullService = setupServiceDefinition(FetchOrNullService::class)
             setupServiceDefinition(FetchCachedService::class)
-            every { anyConstructed<ServiceDefinitionDictionary>().fetch(UnautowirableExcService::class) } throws UnautowirableServiceProviderException(
+            every { anyConstructed<ServiceDefinitionDictionary>().fetch(UnautowirableExcService::class) } throws NoClassFoundUnautowireableAnnotationPresentException(
                 UnautowirableExcService::class,
                 UnautowirableExcService::class
             )
-            every { anyConstructed<ServiceDefinitionDictionary>().fetch(FetchOrNullNoClassFoundExcService::class) } throws NoClassFoundServiceProviderException(
+            every { anyConstructed<ServiceDefinitionDictionary>().fetch(FetchOrNullNoClassFoundExcService::class) } throws NoClassFoundAutowireException(
                 FetchOrNullNoClassFoundExcService::class
             )
         }

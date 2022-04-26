@@ -2,15 +2,16 @@ package com.outlivethesun.serviceprovider.internal.serviceDefinition
 
 import com.outlivethesun.reflectioninfo.ReflectionInfo
 import com.outlivethesun.reflectioninfo.ReflectionInfoException
-import com.outlivethesun.serviceprovider.api.*
+import com.outlivethesun.serviceprovider.api.ServiceInstanceType
 import com.outlivethesun.serviceprovider.api.annotations.Unautowirable
-import com.outlivethesun.serviceprovider.api.exceptions.NoClassFoundServiceProviderException
+import com.outlivethesun.serviceprovider.api.exceptions.NoClassFoundAutowireException
+import com.outlivethesun.serviceprovider.api.exceptions.NoClassFoundUnautowireableAnnotationPresentException
 import com.outlivethesun.serviceprovider.api.exceptions.TooManyClassesFoundServiceProviderException
-import com.outlivethesun.serviceprovider.api.exceptions.UnautowirableServiceProviderException
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 import kotlin.reflect.KClass
 
@@ -46,7 +47,7 @@ internal class ServiceDefinitionDictionaryTest {
         try {
             testObject.fetch(UnautowirableService::class)
             fail("Exception expected")
-        } catch (e: UnautowirableServiceProviderException) {
+        } catch (e: NoClassFoundUnautowireableAnnotationPresentException) {
         }
     }
 
@@ -82,7 +83,7 @@ internal class ServiceDefinitionDictionaryTest {
         try {
             testObject.fetch(IService::class)
             fail("Exception not raised")
-        } catch (e: NoClassFoundServiceProviderException) {
+        } catch (e: NoClassFoundAutowireException) {
         }
     }
 
@@ -105,7 +106,7 @@ internal class ServiceDefinitionDictionaryTest {
         try {
             testObject.fetch(IService::class)
             fail("Exception not raised")
-        } catch (e: UnautowirableServiceProviderException) {
+        } catch (e: NoClassFoundUnautowireableAnnotationPresentException) {
         }
     }
 
