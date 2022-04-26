@@ -1,13 +1,25 @@
 package com.outlivethesun.serviceprovider.internal.serviceDefinition
 
+import com.outlivethesun.serviceprovider.api.ServiceInstanceType
 import com.outlivethesun.serviceprovider.api.testData.IService
 import com.outlivethesun.serviceprovider.api.testData.Service
-import com.outlivethesun.serviceprovider.api.ServiceInstanceType
+import com.outlivethesun.serviceprovider.internal.serviceRequest.IServiceRequest
+import com.outlivethesun.serviceprovider.internal.serviceRequest.typeFetchingTracker.ITypeFetchingTracker
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import kotlin.reflect.KClass
 
 internal class ServiceDefinitionTest {
+
+    private var mockServiceRequest: IServiceRequest = mockk()
+    private var mockTypeFetchingTracker: ITypeFetchingTracker = mockk(relaxed = true)
+
+    init {
+        every { mockServiceRequest.typeFetchingTracker } returns mockTypeFetchingTracker
+    }
 
     interface IService1ToBeAddedAsParameter
     interface IService2ToBeAddedAsParameter
@@ -21,75 +33,75 @@ internal class ServiceDefinitionTest {
     ) : IServiceWithParameters
 
     interface IServiceWithStringParameter
+
     @Suppress("UNUSED_PARAMETER")
     class ServiceWithStringParameter(parameter: String) : IServiceWithStringParameter
 
-    private lateinit var serviceDefinition: ServiceDefinition<*>
+    private lateinit var testObject: ServiceDefinition<*>
 
-    @Suppress("UNCHECKED_CAST")
     @Test
     fun fetchServiceTypeSingleInstantiable() {
-        serviceDefinition = ServiceDefinition(
-            IService::class,
-            Service::class as KClass<IService>,
+        testObject = ServiceDefinition(
+            Service::class,
             ServiceInstanceType.SINGLE_INSTANTIABLE
         )
-        assertNotNull(serviceDefinition.fetchService())
+        assertNotNull(testObject.fetchService(mockServiceRequest))
     }
 
     @Test
     fun fetchServiceTypeSingleInstantiableWithInstance() {
         val service = Service()
-        serviceDefinition =
+        testObject =
             ServiceDefinition(
-                IService::class,
-                Service::class as KClass<out IService>,
+                Service::class,
                 ServiceInstanceType.SINGLE_INSTANTIABLE,
                 service as IService
             )
-        assertEquals(service, serviceDefinition.fetchService())
+        assertEquals(service, testObject.fetchService(mockServiceRequest))
     }
 
     @Test
     fun fetchServiceTypeMultiInstantiable() {
-        serviceDefinition = ServiceDefinition(
-            IService::class,
-            Service::class as KClass<out IService>,
+        testObject = ServiceDefinition(
+            Service::class,
             ServiceInstanceType.MULTI_INSTANTIABLE
         )
-        assertNotNull(serviceDefinition.fetchService())
+        assertNotNull(testObject.fetchService(mockServiceRequest))
     }
 
     @Test
     fun fetchServiceTypeSingleInstantiableCached() {
-        serviceDefinition = ServiceDefinition(
-            IService::class,
-            Service::class as KClass<out IService>,
+        testObject = ServiceDefinition(
+            Service::class,
             ServiceInstanceType.SINGLE_INSTANTIABLE
         )
-        assertEquals(serviceDefinition.fetchService(), serviceDefinition.fetchService())
+        assertEquals(
+            testObject.fetchService(mockServiceRequest),
+            testObject.fetchService(mockServiceRequest)
+        )
     }
 
     @Test
     fun fetchServiceTypeMultiInstantiableCached() {
-        serviceDefinition = ServiceDefinition(
-            IService::class,
-            Service::class as KClass<out IService>,
+        testObject = ServiceDefinition(
+            Service::class,
             ServiceInstanceType.MULTI_INSTANTIABLE
         )
-        assertNotEquals(serviceDefinition.fetchService(), serviceDefinition.fetchService())
+        assertNotEquals(
+            testObject.fetchService(mockServiceRequest),
+            testObject.fetchService(mockServiceRequest)
+        )
     }
 
     @Test
     fun createServiceWithStringParameterExc() {
-        serviceDefinition =
+        testObject =
             ServiceDefinition(
-                IServiceWithStringParameter::class,
                 ServiceWithStringParameter::class,
                 ServiceInstanceType.SINGLE_INSTANTIABLE
             )
         try {
-            serviceDefinition.fetchService()
+            testObject.fetchService(mockServiceRequest)
             fail()
         } catch (e: RuntimeException) {
         }
@@ -97,25 +109,25 @@ internal class ServiceDefinitionTest {
 
     @Test
     fun createServiceWithParameter() {
-        serviceDefinition =
+        testObject =
             ServiceDefinition(
-                IServiceWithParameter::class,
                 ServiceWithParameter::class,
                 ServiceInstanceType.SINGLE_INSTANTIABLE
             )
-        val service = serviceDefinition.fetchService() as ServiceWithParameter
+        val service =
+            testObject.fetchService(mockServiceRequest) as ServiceWithParameter
         assertNotNull(service)
         assertNotNull(service.parameterService)
+        verify { mockServiceRequest.typeFetchingTracker }
     }
 
     @Test
     fun createServiceWithParameters() {
-        serviceDefinition =
+        testObject =
             ServiceDefinition(
-                IServiceWithParameters::class,
                 ServiceWithParameters::class,
                 ServiceInstanceType.SINGLE_INSTANTIABLE
             )
-        assertNotNull(serviceDefinition.fetchService())
+        assertNotNull(testObject.fetchService(mockServiceRequest))
     }
 }

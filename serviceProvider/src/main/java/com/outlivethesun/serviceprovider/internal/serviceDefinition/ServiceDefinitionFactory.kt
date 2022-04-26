@@ -5,20 +5,18 @@ import com.outlivethesun.serviceprovider.internal.extensions.getServiceInstanceT
 import kotlin.reflect.KClass
 
 internal class ServiceDefinitionFactory : IServiceDefinitionFactory {
-    override fun <A : Any> createByInstance(abstractServiceType: KClass<A>, instance: A): ServiceDefinition<A> {
+    override fun <T : Any> createByInstance(instance: T): IServiceDefinition<T> {
         return ServiceDefinition(
-            abstractServiceType,
             instance::class,
             instance::class.getServiceInstanceType(),
             instance
         )
     }
 
-    override fun <A : Any> createByType(
-        abstractServiceType: KClass<A>,
-        concreteServiceType: KClass<out A>,
+    override fun <T : Any> createByType(
+        concreteServiceType: KClass<out T>,
         serviceInstanceType: ServiceInstanceType
-    ): ServiceDefinition<A> {
-        return ServiceDefinition(abstractServiceType, concreteServiceType, serviceInstanceType)
+    ): IServiceDefinition<T> {
+        return ServiceDefinition(concreteServiceType, serviceInstanceType)
     }
 }

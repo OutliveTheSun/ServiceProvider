@@ -1,6 +1,6 @@
 package com.outlivethesun.serviceprovider.api.exceptions
 
-import com.outlivethesun.serviceprovider.api.Unautowirable
+import com.outlivethesun.serviceprovider.api.annotations.Unautowirable
 import kotlin.reflect.KClass
 
 class UnautowirableServiceProviderException(

@@ -3,8 +3,8 @@ package com.outlivethesun.serviceprovider.internal.serviceDefinition
 import com.outlivethesun.reflectioninfo.ReflectionInfo
 import com.outlivethesun.reflectioninfo.ReflectionInfoException
 import com.outlivethesun.serviceprovider.api.*
+import com.outlivethesun.serviceprovider.api.annotations.Unautowirable
 import com.outlivethesun.serviceprovider.api.exceptions.NoClassFoundServiceProviderException
-import com.outlivethesun.serviceprovider.api.exceptions.ServiceProviderException
 import com.outlivethesun.serviceprovider.api.exceptions.TooManyClassesFoundServiceProviderException
 import com.outlivethesun.serviceprovider.api.exceptions.UnautowirableServiceProviderException
 import io.mockk.every
@@ -35,7 +35,6 @@ internal class ServiceDefinitionDictionaryTest {
         every {
             mockServiceDefinitionFactory.createByType(
                 kClass,
-                kClass,
                 ServiceInstanceType.SINGLE_INSTANTIABLE
             )
         } returns mockServiceDefinition
@@ -58,7 +57,6 @@ internal class ServiceDefinitionDictionaryTest {
         testObject.fetch(IService::class)
         verify {
             mockServiceDefinitionFactory.createByType(
-                IService::class,
                 Service::class,
                 ServiceInstanceType.SINGLE_INSTANTIABLE
             )
@@ -71,9 +69,10 @@ internal class ServiceDefinitionDictionaryTest {
         every { mockReflectionInfo.findImplementingClassesOfInterface(IService::class) } throws mockReflectionInfoException
         try {
             testObject.fetch(IService::class)
-        } catch (e: ServiceProviderException) {
+            fail()
+        } catch (e: ServiceDefinitionDictionaryException) {
+            assertEquals(mockReflectionInfoException, e.cause)
         }
-        verify { mockReflectionInfoException.message }
     }
 
     @Test
@@ -111,14 +110,14 @@ internal class ServiceDefinitionDictionaryTest {
     }
 
     @Test
-    fun fetchUnautowirableAndTooManyServicesExc(){
+    fun fetchUnautowirableAndTooManyServicesExc() {
         val foundClasses = listOf(Service::class, Service::class, UnautowirableService::class)
         every { mockReflectionInfo.findImplementingClassesOfInterface(IService::class) } returns foundClasses
 
         try {
             testObject.fetch(IService::class)
             fail("Exception not raised")
-        } catch (e: UnautowirableServiceProviderException) {
+        } catch (e: TooManyClassesFoundServiceProviderException) {
         }
     }
 
@@ -131,11 +130,9 @@ internal class ServiceDefinitionDictionaryTest {
 
         verify {
             mockServiceDefinitionFactory.createByType(
-                IService::class,
                 Service::class,
                 ServiceInstanceType.SINGLE_INSTANTIABLE
             )
         }
     }
-
 }

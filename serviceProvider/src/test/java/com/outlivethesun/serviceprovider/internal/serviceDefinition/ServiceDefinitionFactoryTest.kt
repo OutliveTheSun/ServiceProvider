@@ -1,9 +1,11 @@
 package com.outlivethesun.serviceprovider.internal.serviceDefinition
 
-import com.outlivethesun.serviceprovider.api.testData.IService
-import com.outlivethesun.serviceprovider.api.testData.Service
 import com.outlivethesun.serviceprovider.api.ServiceInstanceType
 import com.outlivethesun.serviceprovider.api.annotations.MultiInstantiable
+import com.outlivethesun.serviceprovider.api.testData.IService
+import com.outlivethesun.serviceprovider.api.testData.Service
+import com.outlivethesun.serviceprovider.internal.serviceRequest.IServiceRequest
+import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -14,23 +16,20 @@ class MultiInstanceAnnotated : IMultiInstanceAnnotated
 
 internal class ServiceDefinitionFactoryTest {
 
-    private val serviceDefinitionFactory: IServiceDefinitionFactory = ServiceDefinitionFactory()
+    private val testObject: IServiceDefinitionFactory = ServiceDefinitionFactory()
+    private val mockServiceRequest = mockk<IServiceRequest>()
 
     @Test
     fun createByType() {
         assertNotNull(
-            serviceDefinitionFactory.createByType<IService>(
-                IService::class,
-                Service::class
-            )
+            testObject.createByType<IService>(Service::class, ServiceInstanceType.SINGLE_INSTANTIABLE)
         )
     }
 
     @Test
     fun createByTypeSingleInstantiable() {
         assertNotNull(
-            serviceDefinitionFactory.createByType<IService>(
-                IService::class,
+            testObject.createByType<IService>(
                 Service::class,
                 ServiceInstanceType.SINGLE_INSTANTIABLE
             )
@@ -39,30 +38,24 @@ internal class ServiceDefinitionFactoryTest {
 
     @Test
     fun createByInstance() {
-        assertNotNull(serviceDefinitionFactory.createByInstance(IService::class, Service()))
+        assertNotNull(testObject.createByInstance(Service()))
     }
 
     @Test
     fun createByMultiInstantiableInstance() {
-        val serviceDefinition = serviceDefinitionFactory.createByInstance(
-            IMultiInstanceAnnotated::class,
-            MultiInstanceAnnotated()
-        )
+        val serviceDefinition = testObject.createByInstance(MultiInstanceAnnotated())
         assertNotEquals(
-            serviceDefinition.fetchService(),
-            serviceDefinition.fetchService()
+            serviceDefinition.fetchService(mockServiceRequest),
+            serviceDefinition.fetchService(mockServiceRequest)
         )
     }
 
     @Test
     fun createBySingleInstantiableInstance() {
-        val serviceDefinition = serviceDefinitionFactory.createByInstance(
-            IService::class,
-            Service()
-        )
+        val serviceDefinition = testObject.createByInstance(Service())
         assertEquals(
-            serviceDefinition.fetchService(),
-            serviceDefinition.fetchService()
+            serviceDefinition.fetchService(mockServiceRequest),
+            serviceDefinition.fetchService(mockServiceRequest)
         )
     }
 }

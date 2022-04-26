@@ -1,98 +1,102 @@
 package com.outlivethesun.serviceprovider.api
 
+import com.outlivethesun.serviceprovider.api.exceptions.ServiceProviderException
 import kotlin.reflect.KClass
 
+/**
+ * An implementation of this interface is responsible for loading, retrieving and administering services.
+ */
 interface IServiceProvider {
     /**
-     * Returns a cached service. Creates a service if it is not cached yet by autowiring or prior registration.
-     * Throws an exception if a service cannot be created.
+     * Returns a service of the given [abstractServiceType]. It either returns a cached service
+     * or creates one by autowiring or registration.
+     * Throws an exception of type [ServiceProviderException] if a service cannot be returned.
      */
-    fun <A : Any> fetch(abstractServiceType: KClass<A>): A
+    fun <T : Any> fetch(abstractServiceType: KClass<T>): T
 
     /**
-     * Returns a cached service. Creates a service if it is not cached yet by autowiring or prior registration.
+     * Returns a cached service of the given [abstractServiceType]. Creates a service if it is not cached yet by autowiring or prior registration.
      * Returns null if there is no service to be autowired.
      */
-    fun <A : Any> fetchOrNull(abstractServiceType: KClass<A>): A?
+    fun <T : Any> fetchOrNull(abstractServiceType: KClass<T>): T?
 
     /**
-     * Returns a cached service or null.
+     * Returns a cached service of the given [abstractServiceType] or null if it is not found. The service is not created.
      */
-    fun <A : Any> find(abstractServiceType: KClass<A>): A?
+    fun <T : Any> find(abstractServiceType: KClass<T>): T?
 
     /**
-     * Adds an existing service to the cache to be fetched/found later.
+     * Adds an existing service of the given [abstractServiceType] to the cache to be fetched/found later.
      */
-    fun <A : Any> put(abstractServiceType: KClass<A>, service: A)
+    fun <T : Any> put(abstractServiceType: KClass<T>, service: T)
 
     /**
-     * Removes an existing service from the cache.
+     * Removes an existing service of the given [abstractServiceType] from the cache.
      */
-    fun <A : Any> remove(abstractServiceType: KClass<A>)
+    fun <T : Any> remove(abstractServiceType: KClass<T>)
 
     /**
-     * Adds a definition of which concrete service [concreteServiceType] to be fetched when asked for a specific type [abstractServiceType].
+     * Adds a definition of the concrete service of type [concreteServiceType] to be fetched when an [abstractServiceType] is requested.
+     * The [serviceInstanceType] distinguishes whether a service can be created as singleton ([ServiceInstanceType.SINGLE_INSTANTIABLE])
+     * or a new instance with each request ([ServiceInstanceType.MULTI_INSTANTIABLE]).
      * ```
      * e.g.
      * ```
      * SP.register(IService:class, Service:class) -> SP.fetch(IService::class) : Service()
-     *
      */
-    fun <A : Any> register(
-        abstractServiceType: KClass<A>,
-        concreteServiceType: KClass<out A>,
+    fun <T : Any> register(
+        abstractServiceType: KClass<T>,
+        concreteServiceType: KClass<out T>,
         serviceInstanceType: ServiceInstanceType = ServiceInstanceType.MULTI_INSTANTIABLE
     )
 }
 
 /**
- * Returns a cached service. Creates a service if it is not cached yet by autowiring or prior registration.
- * Throws an exception if a service cannot be created.
+ * Returns a service of the given generic type [T]. It either returns a cached service
+ * or creates one by autowiring or registration.
+ * Throws an exception of type [ServiceProviderException] if a service cannot be returned.
  */
-inline fun <reified A : Any> IServiceProvider.fetch(): A {
-    return this.fetch(A::class)
+inline fun <reified T : Any> IServiceProvider.fetch(): T {
+    return this.fetch(T::class)
 }
 
 /**
- * Returns a cached service. Creates a service if it is not cached yet by autowiring or prior registration.
+ * Returns a cached service of the given generic type [T]. Creates a service if it is not cached yet by autowiring or prior registration.
  * Returns null if there is no service to be autowired.
  */
-inline fun <reified A : Any> IServiceProvider.fetchOrNull(): A? {
-    return this.fetchOrNull(A::class)
+inline fun <reified T : Any> IServiceProvider.fetchOrNull(): T? {
+    return this.fetchOrNull(T::class)
 }
 
 /**
- * Returns a cached service or null.
- * A service can also be added manually by calling [register].
+ * Returns a cached service of the given generic type [T] or null if it is not found. The service is not created.
  */
-inline fun <reified A : Any> IServiceProvider.find(): A? {
-    return this.find(A::class)
+inline fun <reified T : Any> IServiceProvider.find(): T? {
+    return this.find(T::class)
 }
 
 /**
- * Sets an existing service instance.
- * For registering the service under its abstract type, this type has to be provided by the generics type
- * e.g.:
- * setService<IAbstractServiceName>(concreteServiceInstance)
+ * Adds an existing service of the given generic type [T] to the cache to be fetched/found later.
  */
-inline fun <reified A : Any> IServiceProvider.put(service: A) {
-    this.put(A::class, service)
+inline fun <reified T : Any> IServiceProvider.put(service: T) {
+    this.put(T::class, service)
 }
 
 /**
- * Removes an existing service from the cache.
+ * Removes an existing service of the given generic type [T] from the cache.
  */
-inline fun <reified A : Any> IServiceProvider.remove() {
-    this.remove(A::class)
+inline fun <reified T : Any> IServiceProvider.remove() {
+    this.remove(T::class)
 }
 
 /**
- * Adds a definition of which concrete service [C] to be fetched when asked for a specific type [A].
+ * Adds a definition of the concrete service of type [C] to be fetched when a service of type [A] is requested.
+ * The [serviceInstanceType] distinguishes whether a service can be created as singleton ([ServiceInstanceType.SINGLE_INSTANTIABLE])
+ * or a new instance with each request ([ServiceInstanceType.MULTI_INSTANTIABLE]).
  * ```
  * e.g.
  * ```
- * SP.register<IService, Service>() -> SP.fetch<IService> : Service()
- *
+ * SP.register<IService, Service>() -> SP.fetch<IService>() : Service()
  */
 inline fun <reified A : Any, reified C : A> IServiceProvider.register(serviceInstanceType: ServiceInstanceType = ServiceInstanceType.MULTI_INSTANTIABLE) {
     this.register(A::class, C::class, serviceInstanceType)

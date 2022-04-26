@@ -2,10 +2,8 @@ package com.outlivethesun.implementationtest
 
 import com.outlivethesun.serviceprovider.api.SP
 import com.outlivethesun.serviceprovider.api.fetch
-import com.outlivethesun.serviceprovider.api.Unautowirable
+import com.outlivethesun.serviceprovider.api.annotations.Unautowirable
 import com.outlivethesun.serviceprovider.api.annotations.MultiInstantiable
-import kotlin.reflect.KAnnotatedElement
-import kotlin.reflect.KClass
 import kotlin.reflect.full.hasAnnotation
 
 interface ISomeService
@@ -47,7 +45,7 @@ interface IMultiInstantiable
 class MultiInstantiableService : IMultiInstantiable
 
 fun main() {
-//    unautowirableError()
+    unautowirableError()
 //    tooManyClassesError()
 //    noClassesError()
 //    withInstanceParameter()

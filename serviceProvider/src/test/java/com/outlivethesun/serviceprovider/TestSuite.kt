@@ -5,8 +5,9 @@ import com.outlivethesun.serviceprovider.api.SPFetchTest
 import com.outlivethesun.serviceprovider.api.SPFindTest
 import com.outlivethesun.serviceprovider.api.SPPutTest
 import com.outlivethesun.serviceprovider.api.SPRemoveTest
-import com.outlivethesun.serviceprovider.internal.typeFetchingTracker.TypeFetchingTracker
-import com.outlivethesun.serviceprovider.internal.typeFetchingTracker.TypeFetchingTrackerTest
+import com.outlivethesun.serviceprovider.integrationTests.CircularReferenceFetchTest
+import com.outlivethesun.serviceprovider.internal.serviceRequest.typeFetchingTracker.TypeFetchingTracker
+import com.outlivethesun.serviceprovider.internal.serviceRequest.typeFetchingTracker.TypeFetchingTrackerTest
 import org.junit.platform.suite.api.*
 
 
@@ -23,11 +24,18 @@ import org.junit.platform.suite.api.*
 class TrackerClassSuite
 
 @Suite
-@SelectClasses(SPFetchTest::class, SPFindTest::class, SPPutTest::class, SPRegisterTest::class, SPRemoveTest::class)
+@SelectClasses(
+    SPFetchTest::class,
+    SPFindTest::class,
+    SPPutTest::class,
+    SPRegisterTest::class,
+    SPRemoveTest::class,
+//    CircularReferenceFetchTest::class
+)
 class SPSuite
 
 @Suite
-@SelectPackages("com.outlivethesun.serviceprovider.api", "com.outlivethesun.serviceprovider.internal")
+@SelectPackages("com.outlivethesun.serviceprovider.api", "com.outlivethesun.serviceprovider.internal", "com.outlivethesun.serviceprovider.integrationTests")
 /**
  * Exclude the [TypeFetchingTracker] and Service Provider Tests because it is executed first before anything else
  */

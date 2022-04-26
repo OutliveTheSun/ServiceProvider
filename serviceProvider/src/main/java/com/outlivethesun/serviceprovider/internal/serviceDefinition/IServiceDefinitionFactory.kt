@@ -3,15 +3,14 @@ package com.outlivethesun.serviceprovider.internal.serviceDefinition
 import com.outlivethesun.serviceprovider.api.ServiceInstanceType
 import kotlin.reflect.KClass
 
+/**
+ * This interface is responsible for creating instances of type [IServiceDefinition]
+ */
 internal interface IServiceDefinitionFactory {
-    fun <A : Any> createByInstance(
-        abstractServiceType: KClass<A>,
-        instance: A
-    ): ServiceDefinition<A>
+    fun <T : Any> createByInstance(instance: T): IServiceDefinition<T>
 
-    fun <A : Any> createByType(
-        abstractServiceType: KClass<A>,
-        concreteServiceType: KClass<out A>,
-        serviceInstanceType: ServiceInstanceType = ServiceInstanceType.MULTI_INSTANTIABLE
-    ): ServiceDefinition<A>
+    fun <T : Any> createByType(
+        concreteServiceType: KClass<out T>,
+        serviceInstanceType: ServiceInstanceType
+    ): IServiceDefinition<T>
 }

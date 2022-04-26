@@ -7,7 +7,7 @@ import com.outlivethesun.serviceprovider.api.exceptions.UnautowirableServiceProv
 import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinition
 import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinitionDictionary
 import com.outlivethesun.serviceprovider.internal.serviceDefinition.ServiceDefinitionFactory
-import com.outlivethesun.serviceprovider.internal.typeFetchingTracker.TypeFetchingTracker
+import com.outlivethesun.serviceprovider.internal.serviceRequest.typeFetchingTracker.TypeFetchingTracker
 import io.mockk.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
@@ -41,10 +41,9 @@ internal class SPFetchTest {
             mockkConstructor(ServiceDefinitionFactory::class)
             mockkConstructor(ServiceDefinitionDictionary::class)
             mockkConstructor(TypeFetchingTracker::class)
-            justRun { anyConstructed<TypeFetchingTracker>().checkIsNotAlreadyTracking(any()) }
-            justRun { anyConstructed<TypeFetchingTracker>().startTracking(any()) }
-            justRun { anyConstructed<TypeFetchingTracker>().stopTracking(any()) }
-            every { anyConstructed<TypeFetchingTracker>().checkIsNotAlreadyTracking(CircularReferenceService::class) } throws CircularReferenceServiceProviderException(
+            justRun { anyConstructed<TypeFetchingTracker>().checkTypeIsNotTracked(any()) }
+            justRun { anyConstructed<TypeFetchingTracker>().addType(any()) }
+            every { anyConstructed<TypeFetchingTracker>().checkTypeIsNotTracked(CircularReferenceService::class) } throws CircularReferenceServiceProviderException(
                 CircularReferenceService::class
             )
 //            justRun { anyConstructed<TypeFetchingTracker>().checkIsNotAlreadyTracking(TrackerService::class) }
@@ -64,10 +63,9 @@ internal class SPFetchTest {
             val mockServiceDefinition = mockk<ServiceDefinition<T>>()
             val mockService = mockk<T>()
             every { anyConstructed<ServiceDefinitionDictionary>().fetch(type) } returns mockServiceDefinition
-            every { mockServiceDefinition.fetchService() } returns mockService
+            every { mockServiceDefinition.fetchService(any()) } returns mockService
             every {
                 anyConstructed<ServiceDefinitionFactory>().createByType(
-                    type,
                     type,
                     ServiceInstanceType.SINGLE_INSTANTIABLE
                 )
@@ -82,7 +80,7 @@ internal class SPFetchTest {
     }
 
     @Test
-    fun fetchCached(){
+    fun fetchCached() {
         assertEquals(SP.fetch(FetchCachedService::class), SP.fetch(FetchCachedService::class))
     }
 
@@ -113,8 +111,7 @@ internal class SPFetchTest {
     @Test
     fun checkTracker() {
         SP.fetch<TrackerService>()
-        verify { anyConstructed<TypeFetchingTracker>().checkIsNotAlreadyTracking(TrackerService::class) }
-        verify { anyConstructed<TypeFetchingTracker>().startTracking(any()) }
-        verify { anyConstructed<TypeFetchingTracker>().stopTracking(any()) }
+        verify { anyConstructed<TypeFetchingTracker>().checkTypeIsNotTracked(TrackerService::class) }
+        verify { anyConstructed<TypeFetchingTracker>().addType(any()) }
     }
 }

@@ -1,7 +1,7 @@
 package com.outlivethesun.implementationtest
 
 import com.outlivethesun.serviceprovider.api.SP
-import com.outlivethesun.serviceprovider.api.Unautowirable
+import com.outlivethesun.serviceprovider.api.annotations.Unautowirable
 import com.outlivethesun.serviceprovider.api.fetch
 
 //interface I1
