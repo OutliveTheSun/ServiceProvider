@@ -26,15 +26,12 @@ internal class ServiceDefinitionTest {
 
     interface IService1ToBeAddedAsParameter
     interface IService2ToBeAddedAsParameter
-    class ServiceToBeAddedAsParameter : IService1ToBeAddedAsParameter, IService2ToBeAddedAsParameter
-    interface IServiceWithParameter
-    class ServiceWithParameter(val parameterService: IService1ToBeAddedAsParameter) : IServiceWithParameter
-    interface IServiceWithParameters
+//    class ServiceToBeAddedAsParameter : IService1ToBeAddedAsParameter, IService2ToBeAddedAsParameter
+    class ServiceWithParameter(val parameterService: IService1ToBeAddedAsParameter)
     class ServiceWithParameters(
         val parameterService1: IService1ToBeAddedAsParameter,
         val parameterService2: IService2ToBeAddedAsParameter
-    ) : IServiceWithParameters
-
+    )
     interface IServiceWithStringParameter
 
     @Suppress("UNUSED_PARAMETER")
@@ -85,7 +82,7 @@ internal class ServiceDefinitionTest {
     }
 
     @Test
-    fun fetchServiceTypeMultiInstantiableCached() {
+    fun fetchServiceTypeMultiInstantiableNotCached() {
         testObject = ServiceDefinition(
             Service::class,
             ServiceInstanceType.MULTI_INSTANTIABLE
@@ -112,8 +109,8 @@ internal class ServiceDefinitionTest {
 
     @Test
     fun createServiceWithParameter() {
-        val mockServiceParameter = mockk<IService2ToBeAddedAsParameter>()
-        every { mockServiceProvider.fetch(IService2ToBeAddedAsParameter::class, mockServiceRequest) } returns mockServiceParameter
+        val mockServiceParameter = mockk<IService1ToBeAddedAsParameter>()
+        every { mockServiceProvider.fetch(IService1ToBeAddedAsParameter::class, mockServiceRequest) } returns mockServiceParameter
         testObject =
             ServiceDefinition(
                 ServiceWithParameter::class,
@@ -122,17 +119,23 @@ internal class ServiceDefinitionTest {
         val service =
             testObject.fetchService(mockServiceRequest) as ServiceWithParameter
         assertNotNull(service)
-        assertNotNull(service.parameterService)
-        verify { mockServiceRequest.typeFetchingTracker }
+        assertEquals(mockServiceParameter, service.parameterService)
     }
 
     @Test
     fun createServiceWithParameters() {
+        val mockServiceParameter1 = mockk<IService1ToBeAddedAsParameter>()
+        val mockServiceParameter2 = mockk<IService2ToBeAddedAsParameter>()
+        every { mockServiceProvider.fetch(IService1ToBeAddedAsParameter::class, mockServiceRequest) } returns mockServiceParameter1
+        every { mockServiceProvider.fetch(IService2ToBeAddedAsParameter::class, mockServiceRequest) } returns mockServiceParameter2
         testObject =
             ServiceDefinition(
                 ServiceWithParameters::class,
                 ServiceInstanceType.SINGLE_INSTANTIABLE
             )
-        assertNotNull(testObject.fetchService(mockServiceRequest))
+        val service = testObject.fetchService(mockServiceRequest) as ServiceWithParameters
+        assertNotNull(service)
+        assertEquals(mockServiceParameter1, service.parameterService1)
+        assertEquals(mockServiceParameter2, service.parameterService2)
     }
 }

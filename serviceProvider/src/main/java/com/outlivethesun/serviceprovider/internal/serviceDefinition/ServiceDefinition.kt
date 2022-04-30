@@ -1,9 +1,7 @@
 package com.outlivethesun.serviceprovider.internal.serviceDefinition
 
-import com.outlivethesun.serviceprovider.api.SP
 import com.outlivethesun.serviceprovider.api.ServiceInstanceType
 import com.outlivethesun.serviceprovider.api.exceptions.InvalidConstructorParameterTypeServiceProviderException
-import com.outlivethesun.serviceprovider.internal.ServiceProvider
 import com.outlivethesun.serviceprovider.internal.serviceRequest.IServiceRequest
 import java.sql.Timestamp
 import java.time.LocalDate
@@ -82,5 +80,4 @@ internal class ServiceDefinition<T : Any>(
             LocalTime::class
         )
     }
-
 }

@@ -3,7 +3,6 @@ package com.outlivethesun.serviceprovider.internal
 import com.outlivethesun.reflectioninfo.IReflectionInfo
 import com.outlivethesun.reflectioninfo.ReflectionInfo
 import com.outlivethesun.serviceprovider.api.IServiceProvider
-import com.outlivethesun.serviceprovider.api.SP
 import com.outlivethesun.serviceprovider.api.ServiceInstanceType
 import com.outlivethesun.serviceprovider.api.exceptions.CircularReferenceServiceProviderException
 import com.outlivethesun.serviceprovider.api.exceptions.NoClassFoundAutowireException
@@ -30,31 +29,9 @@ internal class ServiceProvider : IServiceProvider {
         return fetch(abstractServiceType, ServiceRequest(this, abstractServiceType))
     }
 
-    @Suppress("UNCHECKED_CAST")
-    fun <T : Any> fetch(abstractServiceType: KClass<T>, serviceRequest: IServiceRequest): T {
-        checkForCircularReference(serviceRequest, abstractServiceType)
-        val service: Any
-        serviceRequest.typeFetchingTracker.addType(abstractServiceType)
-        val serviceDefinition =
-            serviceDefinitions[abstractServiceType] ?: fetchServiceDefinitionFromDictionary(abstractServiceType)
-        service = serviceDefinition.fetchService(serviceRequest)
-        return service as T
-    }
-
-    /**
-     * Check if the [abstractServiceType] is already being requested. Requesting it twice within the same
-     * fetch request would result in an infinite loop. In this case a [CircularReferenceServiceProviderException] is raised.
-     */
-    private fun <T : Any> checkForCircularReference(
-        serviceRequest: IServiceRequest,
-        abstractServiceType: KClass<T>
-    ) {
-        serviceRequest.typeFetchingTracker.checkTypeIsNotTracked(abstractServiceType)
-    }
-
     override fun <T : Any> fetchOrNull(abstractServiceType: KClass<T>): T? {
         return try {
-            SP.fetch(abstractServiceType)
+            fetch(abstractServiceType)
         } catch (e: NoClassFoundAutowireException) {
             null
         }
@@ -88,6 +65,28 @@ internal class ServiceProvider : IServiceProvider {
                 concreteServiceType,
                 serviceInstanceType
             )
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <T : Any> fetch(abstractServiceType: KClass<T>, serviceRequest: IServiceRequest): T {
+        checkForCircularReference(serviceRequest, abstractServiceType)
+        val service: Any
+        serviceRequest.typeFetchingTracker.addType(abstractServiceType)
+        val serviceDefinition =
+            serviceDefinitions[abstractServiceType] ?: fetchServiceDefinitionFromDictionary(abstractServiceType)
+        service = serviceDefinition.fetchService(serviceRequest)
+        return service as T
+    }
+
+    /**
+     * Check if the [abstractServiceType] is already being requested. Requesting it twice within the same
+     * fetch request would result in an infinite loop. In this case a [CircularReferenceServiceProviderException] is raised.
+     */
+    private fun <T : Any> checkForCircularReference(
+        serviceRequest: IServiceRequest,
+        abstractServiceType: KClass<T>
+    ) {
+        serviceRequest.typeFetchingTracker.checkTypeIsNotTracked(abstractServiceType)
     }
 
     private fun <T : Any> fetchServiceDefinitionFromDictionary(abstractServiceType: KClass<T>): IServiceDefinition<T> {

@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
 
 @Tag("TypeFetchingTracker")
 internal class TypeFetchingTrackerTest {
-
     private val kClass = TypeFetchingTrackerTest::class
     private val testObject: ITypeFetchingTracker = TypeFetchingTracker()
 
