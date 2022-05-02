@@ -22,13 +22,6 @@ internal class ServiceProviderPutTest {
     }
 
     @Test
-    fun putNotInline() {
-        val service = Service()
-        testObject.put(IService::class, service)
-        Assertions.assertEquals(service, testObject.fetch<IService>())
-    }
-
-    @Test
     fun overwriteService() {
         val service = Service()
         val newService = Service()

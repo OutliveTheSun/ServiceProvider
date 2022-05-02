@@ -105,7 +105,7 @@ internal class ServiceProviderTest {
     }
 
     @Test
-    fun putOverride() {
+    fun putOverrideWithDifferentService() {
         val service2 = Service2()
         testObject.put<IServiceWithTwoImplementations>(Service1())
         testObject.put<IServiceWithTwoImplementations>(service2)

@@ -1,6 +1,5 @@
 package com.outlivethesun.serviceprovider.integrationTests
 
-import com.outlivethesun.serviceprovider.api.SP
 import com.outlivethesun.serviceprovider.api.fetch
 import com.outlivethesun.serviceprovider.api.remove
 import com.outlivethesun.serviceprovider.api.testData.IServiceAutowire
@@ -16,12 +15,5 @@ internal class ServiceProviderRemoveTest {
         val service = testObject.fetch<IServiceAutowire>()
         testObject.remove<IServiceAutowire>()
         Assertions.assertNotEquals(service, testObject.fetch<IServiceAutowire>())
-    }
-
-    @Test
-    fun removeNotInline() {
-        val service = testObject.fetch<IServiceAutowire>()
-        testObject.remove(IServiceAutowire::class)
-        Assertions.assertNotEquals(service, SP.fetch<IServiceAutowire>())
     }
 }

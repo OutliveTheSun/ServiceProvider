@@ -29,20 +29,12 @@ internal class ServiceProviderFetchTest {
     }
 
     @Test
-    fun fetchOrNullExisting() {
+    fun fetchOrNullExistingService() {
         assertNotNull(testObject.fetchOrNull<IFetchService>())
     }
 
     @Test
-    fun fetchOrNullNotExisting() {
+    fun fetchOrNullNotExistingService() {
         assertNull(testObject.fetchOrNull<IFetchNoImplementationService>())
     }
-
-
-//    @Test
-//    fun checkTracker() {
-//        testObject.fetch<TrackerService>()
-//        verify { anyConstructed<TypeFetchingTracker>().checkTypeIsNotTracked(TrackerService::class) }
-//        verify { anyConstructed<TypeFetchingTracker>().addType(any()) }
-//    }
 }

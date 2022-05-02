@@ -22,29 +22,9 @@ class ServiceProviderRegisterTest {
     }
 
     @Test
-    fun registerNotInline() {
-        testObject.register(IServiceWithTwoImplementations::class, Service1::class)
-        Assertions.assertNotNull(testObject.fetch<IServiceWithTwoImplementations>())
-    }
-
-    @Test
     fun registerUncached() {
         testObject.register<IServiceWithTwoImplementations, Service1>()
         Assertions.assertNotEquals(
-            testObject.fetch<IServiceWithTwoImplementations>(),
-            testObject.fetch<IServiceWithTwoImplementations>()
-        )
-    }
-
-    @Test
-    fun registerWithSingleInstantiableTypeNotInline() {
-        testObject.register(
-            IServiceWithTwoImplementations::class,
-            Service1::class,
-            ServiceInstanceType.SINGLE_INSTANTIABLE
-        )
-        Assertions.assertNotNull(testObject.fetch<IServiceWithTwoImplementations>())
-        Assertions.assertEquals(
             testObject.fetch<IServiceWithTwoImplementations>(),
             testObject.fetch<IServiceWithTwoImplementations>()
         )
@@ -64,7 +44,7 @@ class ServiceProviderRegisterTest {
     }
 
     @Test
-    fun registerWithSingleInstanceableCached() {
+    fun registerWithSingleInstantiableCached() {
         testObject.register<IServiceWithTwoImplementations, Service1>(ServiceInstanceType.SINGLE_INSTANTIABLE)
         Assertions.assertEquals(
             testObject.fetch<IServiceWithTwoImplementations>(),

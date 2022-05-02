@@ -24,9 +24,4 @@ internal class ServiceProviderFindTest {
     fun findNull() {
         Assertions.assertNull(testObject.find<IServiceForFindNotToBeFound>())
     }
-
-    @Test
-    fun findNullNotInline() {
-        Assertions.assertNull(testObject.find(IServiceForFindNotToBeFound::class))
-    }
 }
