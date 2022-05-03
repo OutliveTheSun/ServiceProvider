@@ -5,7 +5,7 @@ import pom.model.License
 /**
  * An implementation of this interface adds license information to the pom.xml file
  */
-interface IPomLicenseContext: IPomContext {
+interface IPomLicenseContext : IPomContext {
     var hasApacheLicense: Boolean
     var hasMITLicense: Boolean
     val licenses: List<License>

@@ -1,7 +1,9 @@
 package buildProcessComposer
 
 import buildPublishConfigurator.IBuildPublishConfigurator
+import gradlePropertiesReader.GradlePropertiesReader
 import jar.JarFilesConfigurator
+import libraryMetaData.ILibraryMetaData
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
@@ -12,8 +14,6 @@ import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.get
 import pom.context.IPomContext
 import pom.writer.PomWriter
-import libraryMetaData.ILibraryMetaData
-import gradlePropertiesReader.GradlePropertiesReader
 
 class BuildProcessComposer<T : IPomContext>(
     private val project: Project,
@@ -52,6 +52,7 @@ class BuildProcessComposer<T : IPomContext>(
             groupId = GradlePropertiesReader(project).getStringProperty("groupId")
             artifactId = libraryMetadata.getArtifactId()
         }
+        buildPublishConfigurator.transform?.invoke(buildPublishConfigurator.pomContext)
         //TODO: Verify?
         PomWriter(project, buildPublishConfigurator.pomContext).write(mavenPom)
     }

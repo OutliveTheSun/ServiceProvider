@@ -13,7 +13,8 @@ import pom.context.githubPackagesContext.IPomGithubPackagesContext
 /**
  * This class is responsible for holding all the information on what to write into the pom.xml file
  */
-class PomContext : IPomContext, IPomMavenSettingsContext, IPomLicenseContext, IPomPackagingContext, IPomProjectInfosContext, IPomMavenContext, IPomGithubPackagesContext {
+class PomContext : IPomContext, IPomMavenSettingsContext, IPomLicenseContext, IPomPackagingContext,
+    IPomProjectInfosContext, IPomMavenContext, IPomGithubPackagesContext {
     override var packagingType: PackagingType? = PackagingType.JAR
     override lateinit var groupId: String
     override lateinit var artifactId: String

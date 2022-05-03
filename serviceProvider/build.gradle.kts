@@ -5,7 +5,7 @@ plugins {
     signing
 }
 
-VersionNumbers.dependencyVersions[project.name] = "1.0.21"
+VersionNumbers.dependencyVersions[project.name] = "2.0.0"
 
 val buildProcessConfigFacade = BuildProcessConfigFacade(project)
 publishing {
@@ -17,13 +17,13 @@ publishing {
  */
 //TODO
 //buildProcessConfigFacade.publishToGithubPackages()
-//buildProcessConfigFacade.publishSnapshotToMavenCentralWithDefaultValues("Test")
-//buildProcessConfigFacade.publishToMavenCentralWithDefaultValues()
+//buildProcessConfigFacade.publishSnapshotToMavenCentralWithDefaultValues("ServiceProvider-first test")
+buildProcessConfigFacade.publishToMavenCentralWithDefaultValues("The ServiceProvider is a framework to inject services in Kotlin")
 
 //Signing is only required for publishing to Maven Central and needs to be put after the configuration of the corresponding repository (maven/GitHub)
-//signing {
-//    sign(publishing.publications["mavenJava"])
-//}
+signing {
+    sign(publishing.publications["mavenJava"])
+}
 
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:${VersionNumbers.kotlin}")

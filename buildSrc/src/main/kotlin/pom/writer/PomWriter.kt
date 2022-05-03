@@ -3,8 +3,8 @@ package pom.writer
 import ModuleInfo
 import VersionNumbers
 import gradlePropertiesReader.GradlePropertiesReader
-import groovy.util.Node
 import groovy.xml.QName
+import groovy.util.Node
 import ifNotEmpty
 import org.gradle.api.Project
 import org.gradle.api.artifacts.DependencySet
@@ -32,7 +32,26 @@ class PomWriter(private val project: Project, private val pomContext: IPomContex
                             license {
                                 name.set(license.name)
                                 url.set(license.url)
+                                distribution.set("repo")
                             }
+                        }
+                    }
+                }
+                if(pomContext.hasMITLicense){
+                    licenses{
+                        license{
+                            name.set("The MIT License (MIT)")
+                            url.set("http://opensource.org/licenses/MIT")
+                            distribution.set("repo")
+                        }
+                    }
+                }
+                if(pomContext.hasApacheLicense){
+                    licenses{
+                        license{
+                            name.set("Apache License, Version 2.0")
+                            url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                            distribution.set("repo")
                         }
                     }
                 }
