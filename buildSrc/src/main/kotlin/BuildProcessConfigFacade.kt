@@ -101,7 +101,7 @@ class BuildProcessConfigFacade(override val project: Project) : IBuildProcessCon
         // Ensures that lambdas with functional interfaces can be used
         val compileKotlin: KotlinCompile by project.tasks
         compileKotlin.kotlinOptions {
-            languageVersion = ProjectVersionNumbers.kotlin
+            languageVersion = ProjectVersionNumbers.kotlinCompileOnly
         }
     }
 
