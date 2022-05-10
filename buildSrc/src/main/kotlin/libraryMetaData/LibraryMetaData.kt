@@ -15,6 +15,6 @@ class LibraryMetaData(private val project: Project) : ILibraryMetaData {
     }
 
     override fun getVersionNumber(): String {
-        return moduleInfo.findVersionNumber()
+        return moduleInfo.getVersionNumber()
     }
 }

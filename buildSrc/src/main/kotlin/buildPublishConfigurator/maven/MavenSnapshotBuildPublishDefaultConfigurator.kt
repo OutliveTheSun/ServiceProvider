@@ -8,7 +8,7 @@ import pom.context.mavenContext.IPomMavenContext
 import pom.context.PomContext
 import libraryMetaData.ILibraryMetaData
 import libraryMetaData.LibraryMetaData
-import libraryMetaData.LibrarySnapshotMetaData
+import libraryMetaData.MavenSnapshotLibraryMetaData
 import gradlePropertiesReader.GradlePropertiesReader
 import repositoryConfigurator.IPublishRepositoryConfigurator
 
@@ -25,7 +25,7 @@ class MavenSnapshotBuildPublishDefaultConfigurator(
 ) : IBuildPublishConfigurator<IPomMavenContext> {
     override val publishRepositoryConfigurator: IPublishRepositoryConfigurator =
         MavenCentralSnapshotRepositoryConfigurator(project)
-    override val libraryMetaData: ILibraryMetaData = LibrarySnapshotMetaData(LibraryMetaData(project))
+    override val libraryMetaData: ILibraryMetaData = MavenSnapshotLibraryMetaData(LibraryMetaData(project))
     override val pomContext: IPomMavenContext = PomContext()
     override val transform: IPomMavenContext.() -> Unit = {
         projectUrl = "${GradlePropertiesReader(project).getStringProperty("githubURLPrefix")}/$libraryName"

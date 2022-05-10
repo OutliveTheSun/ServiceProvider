@@ -1,7 +1,6 @@
 package pom.writer
 
 import ModuleInfo
-import VersionNumbers
 import gradlePropertiesReader.GradlePropertiesReader
 import groovy.xml.QName
 import groovy.util.Node
@@ -37,18 +36,18 @@ class PomWriter(private val project: Project, private val pomContext: IPomContex
                         }
                     }
                 }
-                if(pomContext.hasMITLicense){
-                    licenses{
-                        license{
+                if (pomContext.hasMITLicense) {
+                    licenses {
+                        license {
                             name.set("The MIT License (MIT)")
                             url.set("http://opensource.org/licenses/MIT")
                             distribution.set("repo")
                         }
                     }
                 }
-                if(pomContext.hasApacheLicense){
-                    licenses{
-                        license{
+                if (pomContext.hasApacheLicense) {
+                    licenses {
+                        license {
                             name.set("Apache License, Version 2.0")
                             url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
                             distribution.set("repo")
@@ -111,7 +110,7 @@ class PomWriter(private val project: Project, private val pomContext: IPomContex
             if (dep.group == rootProject.name) {
                 val module = rootProject.subprojects.find { module -> module.name == dep.name }
                     ?: throw RuntimeException("No version could be found for the module \"${dep.name}\"")
-                val libVersion = VersionNumbers.dependencyVersions[module.name]
+                val libVersion = ModuleInfo(module).getVersionNumber()
                 groupId = GradlePropertiesReader(project).getStringProperty("groupId")
                 artifactId = ModuleInfo(module).getArtifactId()
                 version = libVersion

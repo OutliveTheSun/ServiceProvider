@@ -5,20 +5,15 @@ plugins {
     signing
 }
 
-VersionNumbers.dependencyVersions[project.name] = "2.0.0"
-
 val buildProcessConfigFacade = BuildProcessConfigFacade(project)
 publishing {
     buildProcessConfigFacade.setupPublishing(this@publishing, configurations.implementation)
 }
 
-/**
- * Configure here where you would like to publish to
- */
-//TODO
-//buildProcessConfigFacade.publishToGithubPackages()
-//buildProcessConfigFacade.publishSnapshotToMavenCentralWithDefaultValues("ServiceProvider-first test")
-buildProcessConfigFacade.publishToMavenCentralWithDefaultValues("The ServiceProvider is a framework to inject services in Kotlin")
+//----------Publish configuration---------------
+ModuleVersionNumbers.dependencyVersions[project.name] = "2.0.0"
+buildProcessConfigFacade.publishSnapshotToGithubPackages()
+//----------------------------------------------
 
 //Signing is only required for publishing to Maven Central and needs to be put after the configuration of the corresponding repository (maven/GitHub)
 signing {
@@ -26,10 +21,10 @@ signing {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:${VersionNumbers.kotlin}")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:${VersionNumbers.kotlin}")
-    api("com.outlivethesun:reflectioninfo:1.0.2")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:${ProjectVersionNumbers.kotlin}")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:${ProjectVersionNumbers.kotlin}")
+    api("com.outlivethesun:reflectioninfo:${ModuleVersionNumbers.reflectionInfo}")
+
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.0")
-    testImplementation("org.junit.platform:junit-platform-suite-engine:1.8.2")
-    testImplementation("io.mockk:mockk:${VersionNumbers.mockk}")
+    testImplementation("io.mockk:mockk:${ProjectVersionNumbers.mockk}")
 }

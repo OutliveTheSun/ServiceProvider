@@ -9,7 +9,7 @@ class ModuleInfo(private val module: Project) {
         return module.name.toLowerCase()
     }
 
-    fun findVersionNumber(): String {
-        return VersionNumbers.dependencyVersions[module.name] ?: throw RuntimeException("${this.javaClass.simpleName}: No version number found for ${getArtifactId()}")
+    fun getVersionNumber(): String {
+        return ModuleVersionNumbers.dependencyVersions[module.name] ?: throw RuntimeException("${this.javaClass.simpleName}: No version number found for ${getArtifactId()}")
     }
 }

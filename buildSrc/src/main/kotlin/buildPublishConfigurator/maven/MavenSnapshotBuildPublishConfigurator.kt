@@ -7,7 +7,7 @@ import pom.context.PomContext
 import pom.context.mavenContext.IPomMavenContext
 import libraryMetaData.ILibraryMetaData
 import libraryMetaData.LibraryMetaData
-import libraryMetaData.LibrarySnapshotMetaData
+import libraryMetaData.MavenSnapshotLibraryMetaData
 import repositoryConfigurator.IPublishRepositoryConfigurator
 
 /**
@@ -21,7 +21,7 @@ class MavenSnapshotBuildPublishConfigurator(
 ) : IBuildPublishConfigurator<IPomMavenContext> {
     override val publishRepositoryConfigurator: IPublishRepositoryConfigurator =
         MavenCentralSnapshotRepositoryConfigurator(project)
-    override val libraryMetaData: ILibraryMetaData = LibrarySnapshotMetaData(LibraryMetaData(project))
+    override val libraryMetaData: ILibraryMetaData = MavenSnapshotLibraryMetaData(LibraryMetaData(project))
     override val pomContext: IPomMavenContext = PomContext()
     override val transform: IPomMavenContext.() -> Unit = transformPom
 }

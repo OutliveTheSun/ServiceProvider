@@ -45,7 +45,7 @@ interface IMultiInstantiable
 class MultiInstantiableService : IMultiInstantiable
 
 fun main() {
-    unautowirableError()
+//    unautowirableError()
 //    tooManyClassesError()
 //    noClassesError()
 //    withInstanceParameter()

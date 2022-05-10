@@ -9,8 +9,8 @@ java {
 }
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:${VersionNumbers.kotlin}")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:${VersionNumbers.kotlin}")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:${ProjectVersionNumbers.kotlin}")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:${ProjectVersionNumbers.kotlin}")
     implementation(project(":serviceProvider"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.7.0")
 }

@@ -1,4 +1,9 @@
-import buildPublishConfigurator.github.GithubPackageBuildPublishConfigurator
+import buildProcessComposer.BuildProcessComposer
+import buildProcessConfigFacade.IBuildProcessConfigFacade
+import buildProcessConfigFacade.PublishingNotSetUpException
+import buildPublishConfigurator.IBuildPublishConfigurator
+import buildPublishConfigurator.github.GithubPackageReleaseBuildPublishConfigurator
+import buildPublishConfigurator.github.GithubPackageSnapshotBuildPublishConfigurator
 import buildPublishConfigurator.maven.MavenReleaseBuildPublishConfigurator
 import buildPublishConfigurator.maven.MavenReleaseBuildPublishDefaultConfigurator
 import buildPublishConfigurator.maven.MavenSnapshotBuildPublishConfigurator
@@ -13,14 +18,9 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.provideDelegate
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import pom.context.IPomContext
 import pom.context.githubPackagesContext.IPomGithubPackagesContext
 import pom.context.mavenContext.IPomMavenContext
-import pom.context.IPomContext
-import buildProcessComposer.IBuildProcessComposer
-import buildProcessComposer.BuildProcessComposer
-import buildProcessConfigFacade.IBuildProcessConfigFacade
-import buildProcessConfigFacade.PublishingNotSetUpException
-import buildPublishConfigurator.IBuildPublishConfigurator
 
 /**
  * This class is responsible for handling the configuration of the build.gradle file (e.g. for adding library publishing)
@@ -36,7 +36,11 @@ class BuildProcessConfigFacade(override val project: Project) : IBuildProcessCon
     }
 
     override fun publishToGithubPackages(transform: (IPomGithubPackagesContext.() -> Unit)?) {
-        compose(GithubPackageBuildPublishConfigurator(project, transform))
+        compose(GithubPackageReleaseBuildPublishConfigurator(project, transform))
+    }
+
+    override fun publishSnapshotToGithubPackages(transform: (IPomGithubPackagesContext.() -> Unit)?) {
+        compose(GithubPackageSnapshotBuildPublishConfigurator(project, transform))
     }
 
     override fun publishToMavenCentral(transform: IPomMavenContext.() -> Unit) {

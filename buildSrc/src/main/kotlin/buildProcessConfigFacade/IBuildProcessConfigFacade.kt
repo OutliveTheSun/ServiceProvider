@@ -20,6 +20,12 @@ interface IBuildProcessConfigFacade {
     fun publishToGithubPackages(transform: (IPomGithubPackagesContext.() -> Unit)? = null)
 
     /**
+     * This sets the project up to be published as a snapshot(test version) in the GithubPackages Repository.
+     * The version number will be marked with "-SNAPSHOT" e.g. "1.2.0-SNAPSHOT"
+     */
+    fun publishSnapshotToGithubPackages(transform: (IPomGithubPackagesContext.() -> Unit)? = null)
+
+    /**
      * This sets the project up to be published in the Maven Central Repository.
      * All attributes from the [IPomMavenContext] have to be supplied.
      */
