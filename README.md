@@ -1,6 +1,42 @@
 # ServiceProvider
 A dependency injection implementation in Kotlin by using a service provider / service locator.
 
+## Installation
+
+To get started add the dependency to the service provider library.
+
+#### Gradle/Maven dependency
+
+<table>
+<thead><tr><th>Approach</th><th>Instruction</th></tr></thead>
+<tr>
+<td><img src="doc/gradle.png" alt="Gradle"/></td>
+<td>
+<pre>
+implementation 'com.outlivethesun:serviceprovider:2.0.0'
+</pre>
+</td>
+</tr>
+<tr>
+<td><img src="doc/gradle.png" alt="Gradle"/> (Kotlin DSL)</td>
+ <td>
+  <pre>implementation("com.outlivethesun:serviceprovider:2.0.0")</pre>
+ </td>
+</tr>
+<tr>
+<td><img src="doc/maven.png" alt="Maven"/></td>
+<td>
+<pre>
+ &lt;dependency&gt;
+     &lt;groupId&gt;com.outlivethesun&lt;/groupId&gt;
+     &lt;artifactId&gt;serviceprovider&lt;/artifactId&gt;
+     &lt;version&gt;2.0.0&lt;/version&gt;
+ &lt;/dependency&gt;
+</pre>
+</td>
+</tr>
+</table>
+
 ## Usage
 The service provider is used to achieve independency from concrete classes and to write more flexible code. Instead of initializing concrete service classes, a service is requested from the service provider via an abstract service type, which is represented by an interface type.
 
