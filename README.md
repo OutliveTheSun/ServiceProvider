@@ -1,4 +1,4 @@
-# service-provider.typescript
+# ServiceProvider
 A dependency injection implementation in Kotlin by using a service provider / service locator.
 
 ## Usage
