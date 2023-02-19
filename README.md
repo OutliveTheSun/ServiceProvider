@@ -10,7 +10,7 @@ To get started add the dependency to the service provider library.
 <table>
 <thead><tr><th>Approach</th><th>Instruction</th></tr></thead>
 <tr>
-<td><img src="doc/gradle.png" alt="Gradle"/></td>
+<td><img src="docs/gradle.png" alt="Gradle"/></td>
 <td>
 <pre>
 implementation 'com.outlivethesun:serviceprovider:2.0.0'
@@ -18,13 +18,13 @@ implementation 'com.outlivethesun:serviceprovider:2.0.0'
 </td>
 </tr>
 <tr>
-<td><img src="doc/gradle.png" alt="Gradle"/> (Kotlin DSL)</td>
+<td><img src="docs/gradle.png" alt="Gradle"/> (Kotlin DSL)</td>
  <td>
   <pre>implementation("com.outlivethesun:serviceprovider:2.0.0")</pre>
  </td>
 </tr>
 <tr>
-<td><img src="doc/maven.png" alt="Maven"/></td>
+<td><img src="docs/maven.png" alt="Maven"/></td>
 <td>
 <pre>
  &lt;dependency&gt;
